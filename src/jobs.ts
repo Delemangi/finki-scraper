@@ -103,7 +103,7 @@ while (true) {
 
     try {
       await webhook.send({
-        content: `${role === undefined || role === '' ? null : roleMention(role)}`,
+        content: role === undefined || role === '' ? null : roleMention(role),
         embeds: [embed]
       });
       logger.info(`Sent job ${job.title}`);
