@@ -36,17 +36,18 @@ while (true) {
   }
 
   const posts = element.querySelectorAll('div.views-row');
-  const firstTitle = posts.item(0).querySelector('a')?.textContent;
+  const firstTitle = posts.item(0).querySelector('a')?.textContent?.trim();
 
   if (!existsSync('cache')) {
     logger.debug('Creating cache directory...');
     await mkdir('cache');
   }
 
-  const cachedTitle = await readFile('./cache/announcements', {
+  let cachedTitle = await readFile('./cache/announcements', {
     encoding: 'utf8',
     flag: 'a+'
   });
+  cachedTitle = cachedTitle.trim();
 
   if (firstTitle === null || firstTitle === undefined) {
     logger.warn('First title is null or undefined, trying again in 30 seconds...');
