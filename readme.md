@@ -18,7 +18,9 @@ Structure:
     "jobsURL": "<webhook url>",
     "jobsRole": "<role ID>",
     "announcementsURL": "<announcement url>",
-    "announcementsRole": "<role ID>"
+    "announcementsRole": "<role ID>",
+    "eventsURL": "<events url>",
+    "eventsRole": "<role ID>"
 }
 ```
 
@@ -28,3 +30,4 @@ The following scripts are available:
 
 1. `npm run jobs`
 2. `npm run announcements`
+3. `npm run events`
