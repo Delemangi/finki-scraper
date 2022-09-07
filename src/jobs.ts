@@ -19,8 +19,7 @@ const webhook = new WebhookClient({ url: config.jobsURL });
 const role = config.jobsRole;
 
 while (true) {
-  logger.info('Searching for announcements...');
-  logger.debug('Fetching...');
+  logger.info('Searching...');
 
   let response: Response;
   let text: string;

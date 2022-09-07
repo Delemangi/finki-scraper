@@ -19,8 +19,7 @@ const webhook = new WebhookClient({ url: config.eventsURL });
 const role = config.eventsRole;
 
 while (true) {
-  logger.info('Searching for announcements...');
-  logger.debug('Fetching...');
+  logger.info('Searching...');
 
   let response: Response;
   let text: string;
