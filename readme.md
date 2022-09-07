@@ -16,7 +16,9 @@ Structure:
 ```json
 {
     "jobsURL": "<webhook url>",
-    "jobsRole": "<role ID>"
+    "jobsRole": "<role ID>",
+    "announcementsURL": "<announcement url>",
+    "announcementsRole": "<role ID>"
 }
 ```
 
@@ -25,3 +27,4 @@ Structure:
 The following scripts are available:
 
 1. `npm run jobs`
+2. `npm run announcements`

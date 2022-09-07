@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "jobs": "tsc && node dist/src/jobs.js"
+    "jobs": "tsc && node dist/src/jobs.js",
+    "announcements": "tsc && node dist/src/announcements.js"
   },
   "dependencies": {
     "discord.js": "^14.3.0",
