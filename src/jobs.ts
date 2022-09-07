@@ -27,7 +27,7 @@ while (true) {
   const element = DOM.window.document.querySelector('#block-system-main > div > div.view-content');
 
   if (element === null) {
-    logger.warn('Jobs container is null');
+    logger.warn('Jobs container is null, trying again in 30 seconds...');
     // 30 seconds
     await setTimeout(30 * 1_000);
     continue;
@@ -42,7 +42,7 @@ while (true) {
   });
 
   if (firstTitle === null || firstTitle === undefined) {
-    logger.warn('First title is null or undefined');
+    logger.warn('First title is null or undefined, trying again in 30 seconds...');
     // 30 seconds
     await setTimeout(30 * 1_000);
     continue;
