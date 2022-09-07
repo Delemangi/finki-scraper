@@ -5,6 +5,7 @@ import {
 import { setTimeout } from 'node:timers/promises';
 import {
   EmbedBuilder,
+  roleMention,
   WebhookClient
 } from 'discord.js';
 import { JSDOM } from 'jsdom';
@@ -13,6 +14,7 @@ import { logger } from './logger.js';
 
 const url = 'https://www.finki.ukim.mk/mk/fcse-jobs-internships';
 const webhook = new WebhookClient({ url: config.jobsURL });
+const role = config.jobsRole;
 
 while (true) {
   logger.info('Searching for jobs...');
@@ -80,7 +82,10 @@ while (true) {
       .setDescription(job.content as string)
       .setColor('#313183');
 
-    await webhook.send({ embeds: [embed] });
+    await webhook.send({
+      content: `${role === undefined || role === '' ? null : roleMention(role)}`,
+      embeds: [embed]
+    });
 
     logger.info('Job sent');
   }

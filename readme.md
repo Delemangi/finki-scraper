@@ -15,7 +15,8 @@ Structure:
 
 ```json
 {
-    "jobsURL": "<webhook url>"
+    "jobsURL": "<webhook url>",
+    "jobsRole": "<role ID>"
 }
 ```
 
