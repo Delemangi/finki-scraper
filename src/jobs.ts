@@ -49,7 +49,7 @@ while (true) {
   }
 
   if (cachedTitle === firstTitle) {
-    logger.info('No new jobs');
+    logger.info('No new jobs, trying again in 1 hour...');
     // 1 hour
     await setTimeout(60 * 60 * 1_000);
     continue;
@@ -82,12 +82,15 @@ while (true) {
       .setDescription(job.content as string)
       .setColor('#313183');
 
-    await webhook.send({
-      content: `${role === undefined || role === '' ? null : roleMention(role)}`,
-      embeds: [embed]
-    });
-
-    logger.info('Job sent');
+    try {
+      await webhook.send({
+        content: `${role === undefined || role === '' ? null : roleMention(role)}`,
+        embeds: [embed]
+      });
+      logger.info(`Sent job ${job.title}`);
+    } catch (error) {
+      logger.error(`Failed to send job ${job.title}\n${error}`);
+    }
   }
 
   await writeFile('cache', firstTitle, {
@@ -95,5 +98,5 @@ while (true) {
     flag: 'w'
   });
 
-  logger.info('Cache updated');
+  logger.debug('Cache updated');
 }
