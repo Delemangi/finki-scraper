@@ -1,0 +1,20 @@
+{
+  "name": "finki-scraper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "jobs": "tsc && node dist/src/jobs.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.3.0",
+    "jsdom": "^20.0.0",
+    "winston": "^3.8.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/jsdom": "^20.0.0",
+    "eslint": "^8.23.0",
+    "eslint-config-canonical": "^37.0.3",
+    "typescript": "^4.8.2"
+  }
+}
