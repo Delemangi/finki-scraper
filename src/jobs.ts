@@ -1,6 +1,8 @@
+import { existsSync } from 'node:fs';
 import {
   writeFile,
-  readFile
+  readFile,
+  mkdir
 } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
 import {
@@ -36,7 +38,13 @@ while (true) {
   const posts = element.querySelectorAll('div.views-row');
 
   const firstTitle = posts.item(0).querySelector('a + a')?.textContent;
-  const cachedTitle = await readFile('cache', {
+
+  if (!existsSync('cache')) {
+    logger.debug('Creating cache directory...');
+    await mkdir('cache');
+  }
+
+  const cachedTitle = await readFile('./cache/jobs', {
     encoding: 'utf8',
     flag: 'a+'
   });
@@ -93,7 +101,7 @@ while (true) {
     }
   }
 
-  await writeFile('cache', firstTitle, {
+  await writeFile('./cache/jobs', firstTitle, {
     encoding: 'utf8',
     flag: 'w'
   });
