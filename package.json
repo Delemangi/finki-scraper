@@ -5,7 +5,8 @@
   "scripts": {
     "jobs": "tsc && node dist/src/jobs.js",
     "announcements": "tsc && node dist/src/announcements.js",
-    "events": "tsc && node dist/src/events.js"
+    "events": "tsc && node dist/src/events.js",
+    "course": "tsc && node dist/src/course.js"
   },
   "dependencies": {
     "discord.js": "^14.3.0",

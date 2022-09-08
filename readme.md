@@ -20,7 +20,13 @@ Structure:
     "announcementsURL": "<announcement url>",
     "announcementsRole": "<role ID>",
     "eventsURL": "<events url>",
-    "eventsRole": "<role ID>"
+    "eventsRole": "<role ID>",
+    "courses": {
+        "course": {
+            "url": "<url>",
+            "role": "<role ID>",
+        }
+    }
 }
 ```
 
@@ -31,3 +37,4 @@ The following scripts are available:
 1. `npm run jobs`
 2. `npm run announcements`
 3. `npm run events`
+4. `npm run course <course> <link> [cache]`
