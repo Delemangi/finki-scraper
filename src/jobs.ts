@@ -99,7 +99,8 @@ while (true) {
       .setURL(job.link)
       .setThumbnail(job.img as string)
       .setDescription(job.content as string)
-      .setColor('#313183');
+      .setColor('#313183')
+      .setTimestamp();
 
     try {
       await webhook.send({

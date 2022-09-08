@@ -103,7 +103,8 @@ while (true) {
       .setURL(event.link)
       .setThumbnail(event.img as string)
       .setDescription(event.content ?? 'No description provided.')
-      .setColor('#313183');
+      .setColor('#313183')
+      .setTimestamp();
 
     try {
       await webhook.send({

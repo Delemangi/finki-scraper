@@ -181,7 +181,8 @@ while (true) {
         .setTitle(post.title ?? null)
         .setURL(post.link ?? null)
         .setDescription(post.content)
-        .setColor('#313183');
+        .setColor('#313183')
+        .setTimestamp();
 
       try {
         await webhook.send({

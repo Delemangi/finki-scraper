@@ -95,7 +95,8 @@ while (true) {
     const embed = new EmbedBuilder()
       .setTitle(announcement.title as string)
       .setURL(announcement.link)
-      .setColor('#313183');
+      .setColor('#313183')
+      .setTimestamp();
 
     try {
       await webhook.send({
