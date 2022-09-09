@@ -59,149 +59,85 @@ while (true) {
     continue;
   }
 
-  const DOM = new JSDOM(text);
-  const element = DOM.window.document.querySelector('table.table.discussion-list');
-
-  if (element === null) {
-    logger.warn('Container is empty, trying again in 10 seconds...');
-    await setTimeout(10 * 1_000);
-    continue;
-  }
-
-  const discussions = element.querySelectorAll('tr.discussion');
-  const linkElement = discussions.item(0).querySelector('div > a');
-
-  if (linkElement === null) {
-    logger.warn('Anchor is empty, trying again in 10 seconds...');
-    await setTimeout(10 * 1_000);
-    continue;
-  }
-
-  const link = linkElement.getAttribute('href');
-
-  if (link === null) {
-    logger.warn('Link is empty, trying again in 10 seconds...');
-    await setTimeout(10 * 1_000);
-    continue;
-  }
-
-  const firstDiscussion = await fetch(link, {
-    credentials: 'omit',
-    headers: { Cookie: `MoodleSession=${config.CoursesCookie}` }
-  });
-  const firstPost = await firstDiscussion.text();
-  const firstPostDOM = new JSDOM(firstPost);
-
-  const articles = firstPostDOM.window.document.querySelectorAll('article');
-  const firstID = articles.item(articles.length - 1).querySelector('[title="Permanent link to this post"]')?.getAttribute('href')?.split('#').at(-1);
-
   if (!existsSync('cache')) {
     logger.debug('Creating cache directory...');
     await mkdir('cache');
   }
 
-  let cachedID: string;
-
   if (cache === undefined) {
-    cachedID = await readFile(`./cache/${course}`, {
+    cache = await readFile(`./cache/${course}`, {
       encoding: 'utf8',
       flag: 'a+'
     });
-  } else {
-    cachedID = cache;
+    cache = cache.trim();
   }
 
-  cachedID = cachedID.trim();
+  const DOM = new JSDOM(text);
+  const threads = DOM.window.document.querySelectorAll('article');
 
-  if (firstID === null || firstID === undefined) {
-    logger.warn('First ID is empty, trying again in 10 seconds...');
-    await setTimeout(10 * 1_000);
-    continue;
-  }
+  const posts = [];
 
-  if (cachedID === firstID) {
-    logger.info('No new course announcements, trying again in 10 minutes...');
-    await setTimeout(10 * 60 * 1_000);
-    continue;
-  }
+  for (const thread of Array.from(threads)) {
+    const link = thread.querySelector('[title="Permanent link to this post"]')?.getAttribute('href');
+    const ID = link?.split('#').at(-1);
 
-  const announcements = [];
-
-  for (const discussion of Array.from(discussions)) {
-    const postLinks = [];
-    const postLink = discussion.querySelector('div > a')?.getAttribute('href');
-
-    if (postLink === null || postLink === undefined) {
-      logger.warn('Post link is empty, trying again in 10 seconds...');
-      await setTimeout(10 * 1_000);
-      continue;
-    }
-
-    const discussionFetch = await fetch(postLink, {
-      credentials: 'omit',
-      headers: { Cookie: `MoodleSession=${config.CoursesCookie}` }
-    });
-    const thread = await discussionFetch.text();
-    const threadDOM = new JSDOM(thread);
-    const threadArticles = threadDOM.window.document.querySelectorAll('article');
-    let flag = false;
-
-    for (const threadArticle of Array.from(threadArticles)) {
-      const ID = threadArticle.querySelector('[title="Permanent link to this post"]')?.getAttribute('href')?.split('#').at(-1);
-
-      if (ID === cachedID) {
-        logger.info('Found all new course announcements');
-        flag = true;
-        break;
-      }
-
-      postLinks.push({
-        content: threadArticle.querySelector('div.post-content-container')?.textContent?.trim(),
-        link: threadArticle.querySelector('[title="Permanent link to this post"]')?.getAttribute('href'),
-        title: threadArticle.querySelector('h3')?.textContent
-      });
-    }
-
-    announcements.push(postLinks);
-
-    if (flag) {
+    if (ID === cache) {
       break;
     }
+
+    posts.push({
+      authorImage: thread.querySelector('img[title*="Picture of"]')?.getAttribute('src'),
+      authorName: thread.querySelector('h4 + div > a')?.textContent,
+      content: thread.querySelector('div.post-content-container')?.textContent?.trim(),
+      link,
+      title: thread.querySelector('h4 > a:last-of-type')?.textContent
+    });
   }
 
-  for (const thread of announcements.reverse()) {
-    for (const post of thread) {
-      if (post.content === undefined || post.content === null || post.content === '') {
-        post.content = 'No description provided.';
-      } else if (post.content.length > 200) {
-        post.content = post.content.slice(0, 200) + '...';
-      }
+  for (const post of posts.reverse()) {
+    if (post.content === undefined || post.content === null || post.content === '') {
+      post.content = 'No description provided.';
+    } else if (post.content.length > 200) {
+      post.content = post.content.slice(0, 200) + '...';
+    }
 
-      const embed = new EmbedBuilder()
-        .setTitle(post.title ?? null)
-        .setURL(post.link ?? null)
-        .setDescription(post.content)
-        .setColor('#313183')
-        .setTimestamp();
+    const embed = new EmbedBuilder()
+      .setTitle(post.title ?? null)
+      .setAuthor({
+        iconURL: post.authorImage as string,
+        name: post.authorName as string
+      })
+      .setURL(post.link ?? null)
+      .setDescription(post.content)
+      .setColor('#313183')
+      .setTimestamp();
 
-      try {
-        await webhook.send({
-          content: role === undefined || role === '' ? null : roleMention(role),
-          embeds: [embed]
-        });
-        logger.info(`Sent announcement ${post.title}`);
-      } catch (error) {
-        logger.error(`Failed to send announcement ${post.title}\n${error}`);
-      }
+    try {
+      await webhook.send({
+        content: role === undefined || role === '' ? null : roleMention(role),
+        embeds: [embed]
+      });
+      logger.info(`Sent announcement ${post.title}`);
+    } catch (error) {
+      logger.error(`Failed to send announcement ${post.title}\n${error}`);
     }
   }
 
-  await writeFile(`./cache/${course}`, firstID, {
-    encoding: 'utf8',
-    flag: 'w'
-  });
+  if (posts.length === 0) {
+    logger.info('No announcements found');
+  } else {
+    logger.info(`Found ${posts.length} announcements`);
 
-  cache = undefined;
+    cache = posts.at(-1)?.link?.split('#').at(-1);
 
-  logger.debug('Cache updated');
+    await writeFile(`./cache/${course}`, cache?.trim() ?? '', {
+      encoding: 'utf8',
+      flag: 'w'
+    });
+
+    logger.info('Cached last ID');
+  }
+
+  logger.info('Waiting 10 minutes...');
+  await setTimeout(10 * 60 * 1_000);
 }
