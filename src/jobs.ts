@@ -12,8 +12,9 @@ import {
 } from 'discord.js';
 import { JSDOM } from 'jsdom';
 import config from '../config/config.json' assert {'type': 'json'};
-import { logger } from './logger.js';
+import { getLogger } from './logger.js';
 
+const logger = getLogger('jobs');
 const url = 'https://www.finki.ukim.mk/mk/fcse-jobs-internships';
 const webhook = new WebhookClient({ url: config.jobsURL });
 const role = config.jobsRole;

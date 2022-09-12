@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import { JSDOM } from 'jsdom';
 import config from '../config/config.json' assert {'type': 'json'};
-import { logger } from './logger.js';
+import { getLogger } from './logger.js';
 
 // eslint-disable-next-line prefer-const
 let [course, url, cache] = argv.slice(2);
@@ -29,6 +29,8 @@ if (url === undefined || url === '') {
 if (!(course in config.courses)) {
   throw new Error('Course not found');
 }
+
+const logger = getLogger(course);
 
 // @ts-expect-error Cannot happen
 const webhook = new WebhookClient({ url: config.courses[course].url });

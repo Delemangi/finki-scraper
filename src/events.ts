@@ -12,8 +12,9 @@ import {
 } from 'discord.js';
 import { JSDOM } from 'jsdom';
 import config from '../config/config.json' assert {'type': 'json'};
-import { logger } from './logger.js';
+import { getLogger } from './logger.js';
 
+const logger = getLogger('events');
 const url = 'https://finki.ukim.mk/mk/fcse-events';
 const webhook = new WebhookClient({ url: config.eventsURL });
 const role = config.eventsRole;
