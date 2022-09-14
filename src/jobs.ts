@@ -50,26 +50,26 @@ while (true) {
   }
 
   const posts = element.querySelectorAll('div.views-row');
-  const firstTitle = posts.item(0).querySelector('a + a')?.textContent?.trim();
+  const lastPostID = posts.item(0).querySelector('a + a')?.getAttribute('href')?.split('/').at(-1);
 
   if (!existsSync('cache')) {
     logger.debug('Creating cache directory...');
     await mkdir('cache');
   }
 
-  let cachedTitle = await readFile('./cache/jobs', {
+  let cache = await readFile('./cache/jobs', {
     encoding: 'utf8',
     flag: 'a+'
   });
-  cachedTitle = cachedTitle.trim();
+  cache = cache.trim();
 
-  if (firstTitle === null || firstTitle === undefined) {
+  if (lastPostID === null || lastPostID === undefined) {
     logger.warn('First title is null or undefined, trying again in 10 seconds...');
     await setTimeout(10 * 1_000);
     continue;
   }
 
-  if (cachedTitle === firstTitle) {
+  if (cache === lastPostID) {
     logger.info('No new jobs, trying again in 10 minutes...');
     await setTimeout(10 * 60 * 1_000);
     continue;
@@ -79,17 +79,20 @@ while (true) {
 
   for (const post of Array.from(posts)) {
     const postElement = post.querySelector('a + a');
+    const link = postElement?.getAttribute('href')?.trim();
     const title = postElement?.textContent;
 
-    if (title === cachedTitle) {
+    if (link?.split('/').at(-1) === cache) {
       logger.info('Found all new jobs');
       break;
     }
 
+    logger.info(`Found job ${title}`);
+
     jobs.push({
       content: post.querySelector('div.col-xs-12.col-sm-8 > div.field-content')?.textContent,
       img: post.querySelector('img')?.getAttribute('src')?.split('?')[0],
-      link: `https://finki.ukim.mk${postElement?.getAttribute('href')}`,
+      link: `https://finki.ukim.mk${link}`,
       title
     });
   }
@@ -114,10 +117,13 @@ while (true) {
     }
   }
 
-  await writeFile('./cache/jobs', firstTitle, {
+  await writeFile('./cache/jobs', lastPostID, {
     encoding: 'utf8',
     flag: 'w'
   });
 
   logger.debug('Cache updated');
+
+  logger.info('Trying again in 10 minutes...');
+  await setTimeout(10 * 60 * 1_000);
 }

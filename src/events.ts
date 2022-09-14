@@ -50,26 +50,26 @@ while (true) {
   }
 
   const posts = element.querySelectorAll('div.news-item');
-  const firstTitle = posts.item(0).querySelector('a + a')?.textContent?.trim();
+  const lastPostID = posts.item(0).querySelector('a + a')?.getAttribute('href')?.split('/').at(-1);
 
   if (!existsSync('cache')) {
     logger.debug('Creating cache directory...');
     await mkdir('cache');
   }
 
-  let cachedTitle = await readFile('./cache/events', {
+  let cache = await readFile('./cache/events', {
     encoding: 'utf8',
     flag: 'a+'
   });
-  cachedTitle = cachedTitle.trim();
+  cache = cache.trim();
 
-  if (firstTitle === null || firstTitle === undefined) {
+  if (lastPostID === null || lastPostID === undefined) {
     logger.warn('First title is empty, trying again in 10 seconds...');
     await setTimeout(10 * 1_000);
     continue;
   }
 
-  if (cachedTitle === firstTitle) {
+  if (cache === lastPostID) {
     logger.info('No new events, trying again in 10 minutes...');
     await setTimeout(10 * 60 * 1_000);
     continue;
@@ -79,17 +79,20 @@ while (true) {
 
   for (const post of Array.from(posts)) {
     const postElement = post.querySelector('a + a');
-    const title = postElement?.textContent;
+    const link = postElement?.getAttribute('href')?.trim();
+    const title = postElement?.textContent?.trim();
 
-    if (title === cachedTitle) {
-      logger.info('Found all new events');
+    if (link?.split('/').at(-1) === cache) {
+      logger.info('Found cached event');
       break;
     }
+
+    logger.info(`Found event ${title}`);
 
     events.push({
       content: post.querySelector('div.col-xs-12.col-sm-8 > div.field-content')?.textContent,
       img: post.querySelector('img')?.getAttribute('src')?.split('?')[0],
-      link: `https://finki.ukim.mk${postElement?.getAttribute('href')}`,
+      link: `https://finki.ukim.mk${link}`,
       title
     });
   }
@@ -118,10 +121,13 @@ while (true) {
     }
   }
 
-  await writeFile('./cache/events', firstTitle, {
+  await writeFile('./cache/events', lastPostID, {
     encoding: 'utf8',
     flag: 'w'
   });
 
   logger.debug('Cache updated');
+
+  logger.info('Trying again in 10 minutes...');
+  await setTimeout(10 * 60 * 1_000);
 }
