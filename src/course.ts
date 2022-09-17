@@ -15,8 +15,8 @@ import { JSDOM } from 'jsdom';
 import config from '../config/config.json' assert {'type': 'json'};
 import { getLogger } from './logger.js';
 
-// eslint-disable-next-line prefer-const
-let [course, url, cache] = argv.slice(2);
+const [course, url] = argv.slice(2);
+let cache = argv[4];
 
 if (course === undefined || course === '') {
   throw new Error('No course specified');
@@ -26,16 +26,18 @@ if (url === undefined || url === '') {
   throw new Error('No url specified');
 }
 
-if (!(course in config.courses)) {
-  throw new Error('Course not found');
-}
-
 const logger = getLogger(course);
+
+if (!(course in config.courses)) {
+  throw new Error(`Course ${course} not found in config`);
+}
 
 // @ts-expect-error Cannot happen
 const webhook = new WebhookClient({ url: config.courses[course].url });
 // @ts-expect-error Cannot happen
 const role = config.courses[course].role;
+const successDelay = config.successDelay;
+const errorDelay = config.errorDelay;
 
 while (true) {
   logger.info('Searching...');
@@ -48,16 +50,23 @@ while (true) {
       credentials: 'omit',
       headers: { Cookie: `MoodleSession=${config.CoursesCookie}` }
     });
+  } catch (error) {
+    logger.warn(`Error while fetching\n${error}`);
+    await setTimeout(errorDelay);
+    continue;
+  }
+
+  try {
     text = await response.text();
   } catch (error) {
-    logger.warn(`Error while fetching, trying again in 10 seconds...\n${error}`);
-    await setTimeout(10 * 1_000);
+    logger.warn(`Error while parsing fetch results\n${error}`);
+    await setTimeout(errorDelay);
     continue;
   }
 
   if (!response.ok) {
-    logger.warn(`Received response code ${response.status}, trying again in 10 seconds...`);
-    await setTimeout(10 * 1_000);
+    logger.warn(`Received response code ${response.status}`);
+    await setTimeout(errorDelay);
     continue;
   }
 
@@ -136,10 +145,8 @@ while (true) {
       encoding: 'utf8',
       flag: 'w'
     });
-
-    logger.info('Cached last ID');
   }
 
-  logger.info('Waiting 10 minutes...');
-  await setTimeout(10 * 60 * 1_000);
+  logger.info('Finished');
+  await setTimeout(successDelay);
 }

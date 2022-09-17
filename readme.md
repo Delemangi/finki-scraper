@@ -15,6 +15,9 @@ Structure:
 
 ```json
 {
+    "CoursesCookie": "<courses cookie>",
+    "successDelay": "<ms>",
+    "errorDelay": "<ms>",
     "jobsURL": "<webhook url>",
     "jobsRole": "<role ID>",
     "announcementsURL": "<announcement url>",
