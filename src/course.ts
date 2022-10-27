@@ -36,6 +36,8 @@ if (!(course in config.courses)) {
 const webhook = new WebhookClient({ url: config.courses[course].url });
 // @ts-expect-error Cannot happen
 const role = config.courses[course].role;
+// @ts-expect-error Cannot happen
+const cookie = config.courses[course].cookie;
 const successDelay = config.successDelay;
 const errorDelay = config.errorDelay;
 
@@ -48,7 +50,7 @@ while (true) {
   try {
     response = await fetch(url, {
       credentials: 'omit',
-      headers: { Cookie: `MoodleSession=${config.CoursesCookie}` }
+      headers: { Cookie: `MoodleSession=${cookie}` }
     });
   } catch (error) {
     logger.warn(`Error while fetching\n${error}`);

@@ -28,6 +28,7 @@ Structure:
         "course": {
             "url": "<url>",
             "role": "<role ID>",
+            "cookie": "<Courses cookie>"
         }
     }
 }
