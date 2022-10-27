@@ -15,15 +15,11 @@ import { JSDOM } from 'jsdom';
 import config from '../config/config.json' assert {'type': 'json'};
 import { getLogger } from './logger.js';
 
-const [course, url] = argv.slice(2);
-let cache = argv[4];
+const course = argv[2];
+let cache = argv[3];
 
 if (course === undefined || course === '') {
   throw new Error('No course specified');
-}
-
-if (url === undefined || url === '') {
-  throw new Error('No url specified');
 }
 
 const logger = getLogger(course);
@@ -33,13 +29,19 @@ if (!(course in config.courses)) {
 }
 
 // @ts-expect-error Cannot happen
-const webhook = new WebhookClient({ url: config.courses[course].url });
+const url = config.courses[course].link;
+// @ts-expect-error Cannot happen
+const webhook = new WebhookClient({ url: config.courses[course].webhook });
 // @ts-expect-error Cannot happen
 const role = config.courses[course].role;
 // @ts-expect-error Cannot happen
-const cookie = config.courses[course].cookie;
+let cookie = config.courses[course].cookie;
 const successDelay = config.successDelay;
 const errorDelay = config.errorDelay;
+
+if (cookie === undefined || cookie === '') {
+  cookie = config.cookie;
+}
 
 while (true) {
   logger.info('Searching...');
