@@ -15,23 +15,29 @@ Create a `config` folder and in it create `config.json`. Example:
 {
   "successDelay": 600000,
   "errorDelay": 60000,
-  "cookie": "",
+  "cookie": "[cookie]",
   "scrapers": {
-    "jobs": {
-      "strategy": "jobs",
-      "link": "https://www.finki.ukim.mk/mk/fcse-jobs-internships",
-      "webhook": "<webhook url>",
-      "role": "[role]"
-    },
     "announcements": {
       "strategy": "announcements",
       "link": "https://www.finki.ukim.mk/mk/student-announcement",
       "webhook": "<webhook url>",
       "role": "[role]"
     },
+    "jobs": {
+      "strategy": "jobs",
+      "link": "https://www.finki.ukim.mk/mk/fcse-jobs-internships",
+      "webhook": "<webhook url>",
+      "role": "[role]"
+    },
     "events": {
       "strategy": "events",
       "link": "https://finki.ukim.mk/mk/fcse-events",
+      "webhook": "<webhook url>",
+      "role": "[role]"
+    },
+    "projects_test": {
+      "strategy": "projects",
+      "link": "https://finki.ukim.mk/mk/fcse-projects",
       "webhook": "<webhook url>",
       "role": "[role]"
     },
@@ -46,7 +52,7 @@ Create a `config` folder and in it create `config.json`. Example:
 }
 ```
 
-The parameters marked with `<>` are required, while the ones marked with `[]` are optional.
+The parameters marked with `<>` are required, while the ones marked with `[]` are optional. The cookies specific to courses override the global cookie, and at least one cookie should be specified.
 
 ## Running
 

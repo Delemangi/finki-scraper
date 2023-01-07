@@ -16,6 +16,7 @@ import { AnnouncementsStrategy } from './AnnouncementsStrategy.js';
 import { CourseStrategy } from './CourseStrategy.js';
 import { EventsStrategy } from './EventsStrategy.js';
 import { JobsStrategy } from './JobsStrategy.js';
+import { ProjectsStrategy } from './ProjectsStrategy.js';
 import { getLogger } from './logger.js';
 
 export class Scraper {
@@ -51,6 +52,7 @@ export class Scraper {
       case 'course': return new CourseStrategy();
       case 'events': return new EventsStrategy();
       case 'jobs': return new JobsStrategy();
+      case 'projects': return new ProjectsStrategy();
       default: throw new Error(`Strategy ${strategyName} not found`);
     }
   }
