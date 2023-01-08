@@ -3,7 +3,7 @@ import { EmbedBuilder } from 'discord.js';
 export class ProjectsStrategy implements ScraperStrategy {
   public postsSelector = 'div.news-item';
 
-  public linksSelector = 'a + a';
+  public idsSelector = 'a + a';
 
   public getPostData (e: Element): [string | null, EmbedBuilder] {
     const url = e.querySelector('a + a')?.getAttribute('href')?.trim();
@@ -25,5 +25,9 @@ export class ProjectsStrategy implements ScraperStrategy {
 
   public getRequestInit (): RequestInit | undefined {
     return undefined;
+  }
+
+  public getId (e: Element): string | null {
+    return e.querySelector(this.idsSelector)?.getAttribute('href')?.trim() ?? null;
   }
 }

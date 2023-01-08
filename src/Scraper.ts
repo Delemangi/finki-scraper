@@ -14,6 +14,7 @@ import { type Logger } from 'winston';
 import config from '../config/config.json' assert {'type': 'json'};
 import { AnnouncementsStrategy } from './AnnouncementsStrategy.js';
 import { CourseStrategy } from './CourseStrategy.js';
+import { DiplomasStrategy } from './DiplomasStrategy.js';
 import { EventsStrategy } from './EventsStrategy.js';
 import { JobsStrategy } from './JobsStrategy.js';
 import { ProjectsStrategy } from './ProjectsStrategy.js';
@@ -42,7 +43,7 @@ export class Scraper {
     this.scraperConfig = config.scrapers[scraperName];
     this.strategy = Scraper.getStrategy(this.scraperConfig.strategy);
     this.webhook = new WebhookClient({ url: this.scraperConfig.webhook });
-    this.cookie = this.scraperConfig.cookie ?? config.cookie;
+    this.cookie = Scraper.getCookie(this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {});
     this.logger = getLogger(scraperName);
   }
 
@@ -53,8 +54,13 @@ export class Scraper {
       case 'events': return new EventsStrategy();
       case 'jobs': return new JobsStrategy();
       case 'projects': return new ProjectsStrategy();
+      case 'diplomas': return new DiplomasStrategy();
       default: throw new Error(`Strategy ${strategyName} not found`);
     }
+  }
+
+  public static getCookie (cookie: { [index: string]: string }): string {
+    return Object.entries(cookie).map(([key, value]) => `${key}=${value}`).join('; ');
   }
 
   public async run () {
@@ -98,28 +104,28 @@ export class Scraper {
       })).trim().split('\n');
 
       const DOM = new JSDOM(text);
+      const posts = Array.from(DOM.window.document.querySelectorAll(this.strategy.postsSelector)).slice(0, config.maxPosts);
 
-      const posts = Array.from(DOM.window.document.querySelectorAll(this.strategy.postsSelector));
-      const links = posts.map((post) => post.querySelector(this.strategy.linksSelector)?.getAttribute('href'));
-
-      if (links.length === 0 || links.includes(undefined) || links.includes(null)) {
+      if (posts.length === 0) {
         this.logger.warn('No posts found');
         await setTimeout(config.errorDelay);
         continue;
       }
 
+      const ids = posts.map((post) => this.strategy.getId(post));
       const cacheSet = new Set(cache);
-      if (links.length === cache.length && links.every((value) => cacheSet.has(value as string))) {
+
+      if (ids.length === cache.length && ids.every((value) => cacheSet.has(value as string))) {
         this.logger.info('No new posts');
         await setTimeout(config.successDelay);
         continue;
       }
 
       for (const post of posts.reverse().slice(0.3 * posts.length)) {
-        const [link, embed] = this.strategy.getPostData(post);
+        const [id, embed] = this.strategy.getPostData(post);
 
-        if (link === null || cacheSet.has(link)) {
-          this.logger.info(`Post already sent: ${link}`);
+        if (id === null || cacheSet.has(id)) {
+          this.logger.info(`Post already sent: ${id}`);
           continue;
         }
 
@@ -128,13 +134,13 @@ export class Scraper {
             content: this.scraperConfig.role === undefined || this.scraperConfig.role === '' ? '' : roleMention(this.scraperConfig.role),
             embeds: [embed]
           });
-          this.logger.info(`Sent post: ${link}`);
+          this.logger.info(`Sent post: ${id}`);
         } catch (error) {
-          this.logger.error(`Failed to send post ${link}\n${error}`);
+          this.logger.error(`Failed to send post ${id}\n${error}`);
         }
       }
 
-      await writeFile(`./cache/${this.scraperName}`, links.join('\n'), {
+      await writeFile(`./cache/${this.scraperName}`, ids.join('\n'), {
         encoding: 'utf8',
         flag: 'w'
       });

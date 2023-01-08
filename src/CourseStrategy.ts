@@ -1,9 +1,12 @@
 import { EmbedBuilder } from 'discord.js';
+import config from '../config/config.json' assert {'type': 'json'};
 
 export class CourseStrategy implements ScraperStrategy {
   public postsSelector = 'article';
 
-  public linksSelector = '[title="Permanent link to this post"]';
+  public idsSelector = '[title="Permanent link to this post"]';
+
+  public defaultCookie = config.courseCookie;
 
   public getPostData (e: Element): [string | null, EmbedBuilder] {
     const link = e.querySelector('[title="Permanent link to this post"]')?.getAttribute('href')?.trim() ?? null;
@@ -31,7 +34,11 @@ export class CourseStrategy implements ScraperStrategy {
   public getRequestInit (cookie: string): RequestInit {
     return {
       credentials: 'omit',
-      headers: { Cookie: `MoodleSession=${cookie}` }
+      headers: { Cookie: cookie }
     };
+  }
+
+  public getId (e: Element): string | null {
+    return e.querySelector(this.idsSelector)?.getAttribute('href')?.trim() ?? null;
   }
 }

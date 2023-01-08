@@ -15,7 +15,7 @@ Create a `config` folder and in it create `config.json`. Example:
 {
   "successDelay": 600000,
   "errorDelay": 60000,
-  "cookie": "[cookie]",
+  "maxPosts": 20,
   "scrapers": {
     "announcements": {
       "strategy": "announcements",
@@ -35,7 +35,7 @@ Create a `config` folder and in it create `config.json`. Example:
       "webhook": "<webhook url>",
       "role": "[role]"
     },
-    "projects_test": {
+    "projects": {
       "strategy": "projects",
       "link": "https://finki.ukim.mk/mk/fcse-projects",
       "webhook": "<webhook url>",
