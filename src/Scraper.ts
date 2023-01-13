@@ -113,9 +113,8 @@ export class Scraper {
       }
 
       const ids = posts.map((post) => this.strategy.getId(post));
-      const cacheSet = new Set(cache);
 
-      if (ids.length === cache.length && ids.every((value) => cacheSet.has(value as string))) {
+      if (ids.length === cache.length && ids.every((value) => value === null || cache.includes(value))) {
         this.logger.info('No new posts');
         await setTimeout(config.successDelay);
         continue;
@@ -124,7 +123,7 @@ export class Scraper {
       for (const post of posts.reverse().slice(0.3 * posts.length)) {
         const [id, embed] = this.strategy.getPostData(post);
 
-        if (id === null || cacheSet.has(id)) {
+        if (id === null || cache.includes(id)) {
           this.logger.info(`Post already sent: ${id}`);
           continue;
         }
