@@ -28,6 +28,7 @@ export class JobsStrategy implements ScraperStrategy {
   }
 
   public getId (e: Element): string | null {
-    return e.querySelector(this.idsSelector)?.getAttribute('href')?.trim() ?? null;
+    const url = e.querySelector(this.idsSelector)?.getAttribute('href')?.trim();
+    return url === undefined ? null : `https://finki.ukim.mk${url}`;
   }
 }
