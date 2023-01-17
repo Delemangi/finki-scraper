@@ -13,6 +13,7 @@ declare global {
   type ScraperConfig = {
     cookie?: { [index: string]: string };
     link: string;
+    name?: string;
     role?: string;
     strategy: string;
     webhook: string;

@@ -131,7 +131,8 @@ export class Scraper {
         try {
           await this.webhook.send({
             content: this.scraperConfig.role === undefined || this.scraperConfig.role === '' ? '' : roleMention(this.scraperConfig.role),
-            embeds: [embed]
+            embeds: [embed],
+            ...this.scraperConfig.name !== undefined && { username: this.scraperConfig.name }
           });
           this.logger.info(`Sent post: ${id}`);
         } catch (error) {
