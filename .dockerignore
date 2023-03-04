@@ -1,0 +1,15 @@
+# Node modules
+node_modules
+
+# Output
+dist
+*.js
+
+# Logs
+*.log
+
+# User defined folders
+config
+
+# Environment variables
+.env

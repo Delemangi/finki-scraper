@@ -1,7 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 
-export class EventsStrategy implements ScraperStrategy {
-  public postsSelector = 'div.news-item';
+export class JobsStrategy implements ScraperStrategy {
+  public postsSelector = 'div.views-row';
 
   public idsSelector = 'a + a';
 
@@ -16,7 +16,7 @@ export class EventsStrategy implements ScraperStrategy {
       .setTitle(title)
       .setURL(link)
       .setThumbnail(image)
-      .setDescription(content)
+      .setDescription(content === '' ? 'Нема опис.' : content)
       .setColor('#313183')
       .setTimestamp();
 

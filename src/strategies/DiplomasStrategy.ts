@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import config from '../config/config.json' assert {'type': 'json'};
+import { config } from '../utils/config.js';
 
 export class DiplomasStrategy implements ScraperStrategy {
   public postsSelector = 'div.panel';
@@ -53,7 +53,7 @@ export class DiplomasStrategy implements ScraperStrategy {
           value: status
         }
       ])
-      .setDescription(content)
+      .setDescription(content === '' ? 'Нема опис.' : content)
       .setColor('#313183')
       .setTimestamp();
 

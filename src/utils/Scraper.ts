@@ -11,14 +11,14 @@ import {
 } from 'discord.js';
 import { JSDOM } from 'jsdom';
 import { type Logger } from 'winston';
-import config from '../config/config.json' assert {'type': 'json'};
-import { AnnouncementsStrategy } from './AnnouncementsStrategy.js';
-import { CourseStrategy } from './CourseStrategy.js';
-import { DiplomasStrategy } from './DiplomasStrategy.js';
-import { EventsStrategy } from './EventsStrategy.js';
-import { JobsStrategy } from './JobsStrategy.js';
-import { ProjectsStrategy } from './ProjectsStrategy.js';
-import { getLogger } from './logger.js';
+import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
+import { CourseStrategy } from '../strategies/CourseStrategy.js';
+import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
+import { EventsStrategy } from '../strategies/EventsStrategy.js';
+import { JobsStrategy } from '../strategies/JobsStrategy.js';
+import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
+import { config } from './config.js';
+import { logger } from './logger.js';
 
 export class Scraper {
   private readonly strategy: ScraperStrategy;
@@ -35,19 +35,19 @@ export class Scraper {
 
   public constructor (scraperName: string) {
     if (!Object.keys(config.scrapers).includes(scraperName)) {
-      throw new Error(`Scraper ${scraperName} not found in config`);
+      throw new Error(`[${scraperName}] Scraper not found in config`);
     }
 
     this.scraperName = scraperName;
-    // @ts-expect-error - this is a valid key
+    // @ts-expect-error this is a valid property
     this.scraperConfig = config.scrapers[scraperName];
-    this.strategy = Scraper.getStrategy(this.scraperConfig.strategy);
+    this.strategy = Scraper.getStrategy(this.scraperConfig.strategy, this.scraperName);
     this.webhook = new WebhookClient({ url: this.scraperConfig.webhook });
     this.cookie = Scraper.getCookie(this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {});
-    this.logger = getLogger(scraperName);
+    this.logger = logger;
   }
 
-  public static getStrategy (strategyName: string): ScraperStrategy {
+  public static getStrategy (strategyName: string, scraperName: string): ScraperStrategy {
     switch (strategyName) {
       case 'announcements': return new AnnouncementsStrategy();
       case 'course': return new CourseStrategy();
@@ -55,7 +55,7 @@ export class Scraper {
       case 'jobs': return new JobsStrategy();
       case 'projects': return new ProjectsStrategy();
       case 'diplomas': return new DiplomasStrategy();
-      default: throw new Error(`Strategy ${strategyName} not found`);
+      default: throw new Error(`Strategy ${strategyName} for scraper ${scraperName} not found`);
     }
   }
 
@@ -65,36 +65,35 @@ export class Scraper {
 
   public async run () {
     while (true) {
-      this.logger.info('Searching...');
+      this.logger.info(`[${this.scraperName}] Searching...`);
 
-      let response: Response;
+      let response;
 
       try {
         response = await fetch(this.scraperConfig.link, this.strategy.getRequestInit(this.cookie));
       } catch (error) {
-        this.logger.warn(`Error while fetching\n${error}`);
+        this.logger.warn(`[${this.scraperName}] Error while fetching\n${error}`);
         await setTimeout(config.errorDelay);
         continue;
       }
 
-      let text: string;
+      let text;
 
       try {
         text = await response.text();
       } catch (error) {
-        this.logger.warn(`Error while parsing fetch results\n${error}`);
+        this.logger.warn(`[${this.scraperName}] Error while parsing fetch results\n${error}`);
         await setTimeout(config.errorDelay);
         continue;
       }
 
       if (!response.ok) {
-        this.logger.warn(`Received response code ${response.status}`);
+        this.logger.warn(`[${this.scraperName}] Received response code ${response.status}`);
         await setTimeout(config.errorDelay);
         continue;
       }
 
       if (!existsSync('cache')) {
-        this.logger.debug('Creating cache directory...');
         await mkdir('cache');
       }
 
@@ -107,7 +106,7 @@ export class Scraper {
       const posts = Array.from(DOM.window.document.querySelectorAll(this.strategy.postsSelector)).slice(0, config.maxPosts);
 
       if (posts.length === 0) {
-        this.logger.warn('No posts found');
+        this.logger.warn(`[${this.scraperName}] No posts found`);
         await setTimeout(config.errorDelay);
         continue;
       }
@@ -115,7 +114,7 @@ export class Scraper {
       const ids = posts.map((post) => this.strategy.getId(post));
 
       if (ids.length === cache.length && ids.every((value) => value === null || cache.includes(value))) {
-        this.logger.info('No new posts');
+        this.logger.info(`[${this.scraperName}] No new posts`);
         await setTimeout(config.successDelay);
         continue;
       }
@@ -124,7 +123,7 @@ export class Scraper {
         const [id, embed] = this.strategy.getPostData(post);
 
         if (id === null || cache.includes(id)) {
-          this.logger.info(`Post already sent: ${id}`);
+          this.logger.info(`[${this.scraperName}] Post already sent: ${id}`);
           continue;
         }
 
@@ -134,9 +133,9 @@ export class Scraper {
             embeds: [embed],
             ...this.scraperConfig.name !== undefined && { username: this.scraperConfig.name }
           });
-          this.logger.info(`Sent post: ${id}`);
+          this.logger.info(`[${this.scraperName}] Sent post: ${id}`);
         } catch (error) {
-          this.logger.error(`Failed to send post ${id}\n${error}`);
+          this.logger.error(`[${this.scraperName}] Failed to send post ${id}\n${error}`);
         }
       }
 
@@ -145,7 +144,7 @@ export class Scraper {
         flag: 'w'
       });
 
-      this.logger.info('Finished');
+      this.logger.info(`[${this.scraperName}] Finished`);
       await setTimeout(config.successDelay);
     }
   }

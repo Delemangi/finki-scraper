@@ -1,20 +1,25 @@
 {
   "name": "finki-scraper",
-  "version": "1.0.0",
-  "main": "main.js",
+  "version": "2.0.0",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "tsc && node dist/src/main.js"
+    "build": "rimraf dist && tsc",
+    "lint": "eslint . --ext .ts --cache",
+    "start": "node dist/main.js",
+    "start:dev": "npm run lint && npm run build && npm run start"
   },
   "dependencies": {
     "discord.js": "^14.7.1",
-    "jsdom": "^21.0.0",
+    "jsdom": "^21.1.0",
+    "rimraf": "^4.3.0",
     "winston": "^3.8.2"
   },
   "type": "module",
   "devDependencies": {
-    "@types/jsdom": "^20.0.1",
-    "eslint": "^8.31.0",
-    "eslint-config-canonical": "^39.1.4",
-    "typescript": "^4.9.4"
+    "@types/jsdom": "^21.1.0",
+    "@types/node": "^18.14.6",
+    "eslint": "^8.35.0",
+    "eslint-config-canonical": "^40.0.8",
+    "typescript": "^4.9.5"
   }
 }

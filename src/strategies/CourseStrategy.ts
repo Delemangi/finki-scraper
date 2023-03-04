@@ -1,12 +1,12 @@
 import { EmbedBuilder } from 'discord.js';
-import config from '../config/config.json' assert {'type': 'json'};
+import { config } from '../utils/config.js';
 
 export class CourseStrategy implements ScraperStrategy {
   public postsSelector = 'article';
 
   public idsSelector = '[title="Permanent link to this post"]';
 
-  public defaultCookie = config.courseCookie;
+  public defaultCookie = config.coursesCookie;
 
   public getPostData (e: Element): [string | null, EmbedBuilder] {
     const link = e.querySelector('[title="Permanent link to this post"]')?.getAttribute('href')?.trim() ?? null;
@@ -24,7 +24,7 @@ export class CourseStrategy implements ScraperStrategy {
         url: authorLink
       })
       .setURL(link)
-      .setDescription(content)
+      .setDescription(content === '' ? 'Нема опис.' : content)
       .setColor('#313183')
       .setTimestamp();
 

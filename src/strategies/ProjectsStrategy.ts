@@ -16,7 +16,7 @@ export class ProjectsStrategy implements ScraperStrategy {
       .setTitle(title)
       .setURL(link)
       .setThumbnail(image)
-      .setDescription(content)
+      .setDescription(content === '' ? 'Нема опис.' : content)
       .setColor('#313183')
       .setTimestamp();
 
