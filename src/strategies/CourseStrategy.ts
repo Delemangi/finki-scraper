@@ -1,5 +1,5 @@
-import { EmbedBuilder } from 'discord.js';
 import { config } from '../utils/config.js';
+import { EmbedBuilder } from 'discord.js';
 
 export class CourseStrategy implements ScraperStrategy {
   public postsSelector = 'article';

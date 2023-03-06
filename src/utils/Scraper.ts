@@ -1,16 +1,3 @@
-import { existsSync } from 'node:fs';
-import {
-  writeFile,
-  readFile,
-  mkdir
-} from 'node:fs/promises';
-import { setTimeout } from 'node:timers/promises';
-import {
-  WebhookClient,
-  roleMention
-} from 'discord.js';
-import { JSDOM } from 'jsdom';
-import { type Logger } from 'winston';
 import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
 import { CourseStrategy } from '../strategies/CourseStrategy.js';
 import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
@@ -19,6 +6,19 @@ import { JobsStrategy } from '../strategies/JobsStrategy.js';
 import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
 import { config } from './config.js';
 import { logger } from './logger.js';
+import {
+  roleMention,
+  WebhookClient
+} from 'discord.js';
+import { JSDOM } from 'jsdom';
+import { existsSync } from 'node:fs';
+import {
+  mkdir,
+  readFile,
+  writeFile
+} from 'node:fs/promises';
+import { setTimeout } from 'node:timers/promises';
+import { type Logger } from 'winston';
 
 export class Scraper {
   private readonly strategy: ScraperStrategy;

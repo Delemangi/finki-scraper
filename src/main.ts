@@ -1,7 +1,7 @@
-import { argv } from 'node:process';
-import { Scraper } from './utils/Scraper.js';
 import { config } from './utils/config.js';
 import { logger } from './utils/logger.js';
+import { Scraper } from './utils/Scraper.js';
+import { argv } from 'node:process';
 
 const names = argv.slice(2);
 
