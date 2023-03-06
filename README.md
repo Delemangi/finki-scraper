@@ -18,7 +18,7 @@ It's recommended, but not required to run this inside a Docker container.
 
 ## Running
 
-You may optionally pass arguments to the below to override which scrapers are run.
+You may optionally pass arguments to the below commands to override which scrapers are run.
 
 ### Running (Docker)
 
