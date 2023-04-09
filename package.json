@@ -11,7 +11,7 @@
   "dependencies": {
     "discord.js": "^14.9.0",
     "jsdom": "^21.1.1",
-    "rimraf": "^4.3.0",
+    "rimraf": "^4.4.1",
     "winston": "^3.8.2"
   },
   "type": "module",
