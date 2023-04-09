@@ -1,3 +1,4 @@
+import { join } from 'node:path';
 import { pino } from 'pino';
 
 const transport = pino.transport({
@@ -13,7 +14,7 @@ const transport = pino.transport({
     {
       level: 'info',
       options: {
-        destination: './bot.log',
+        destination: join('.', 'bot.log'),
       },
       target: 'pino/file',
     },
