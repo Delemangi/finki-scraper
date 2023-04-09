@@ -72,7 +72,7 @@ export class Scraper {
       try {
         response = await fetch(this.scraperConfig.link, this.strategy.getRequestInit(this.cookie));
       } catch (error) {
-        this.logger.warn(`[${this.scraperName}] Error while fetching\n${error}`);
+        this.logger.warn(`[${this.scraperName}] Fetch failed\n${error}`);
         await setTimeout(config.errorDelay);
         continue;
       }
@@ -82,7 +82,7 @@ export class Scraper {
       try {
         text = await response.text();
       } catch (error) {
-        this.logger.warn(`[${this.scraperName}] Error while parsing fetch results\n${error}`);
+        this.logger.warn(`[${this.scraperName}] Failed parsing fetch result\n${error}`);
         await setTimeout(config.errorDelay);
         continue;
       }
@@ -102,8 +102,8 @@ export class Scraper {
         flag: 'a+'
       })).trim().split('\n');
 
-      const DOM = new JSDOM(text);
-      const posts = Array.from(DOM.window.document.querySelectorAll(this.strategy.postsSelector)).slice(0, config.maxPosts);
+      const dom = new JSDOM(text);
+      const posts = Array.from(dom.window.document.querySelectorAll(this.strategy.postsSelector)).slice(0, config.maxPosts);
 
       if (posts.length === 0) {
         this.logger.warn(`[${this.scraperName}] No posts found`);
@@ -119,7 +119,7 @@ export class Scraper {
         continue;
       }
 
-      for (const post of posts.reverse().slice(0.3 * posts.length)) {
+      for (const post of [...posts].reverse().slice(0.3 * posts.length)) {
         const [id, embed] = this.strategy.getPostData(post);
 
         if (id === null || cache.includes(id)) {
