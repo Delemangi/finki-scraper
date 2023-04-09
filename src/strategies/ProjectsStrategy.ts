@@ -5,12 +5,18 @@ export class ProjectsStrategy implements ScraperStrategy {
 
   public idsSelector = 'a + a';
 
-  public getPostData (e: Element): [string | null, EmbedBuilder] {
-    const url = e.querySelector('a + a')?.getAttribute('href')?.trim();
+  public getPostData(element: Element): [string | null, EmbedBuilder] {
+    const url = element.querySelector('a + a')?.getAttribute('href')?.trim();
     const link = url === undefined ? null : `https://finki.ukim.mk${url}`;
-    const title = e.querySelector('a + a')?.textContent?.trim() ?? '?';
-    const content = e.querySelector('div.col-xs-12.col-sm-8 > div.field-content')?.textContent?.trim().slice(0, 500) ?? '?';
-    const image = e.querySelector('img')?.getAttribute('src')?.split('?').at(0) ?? '?';
+    const title = element.querySelector('a + a')?.textContent?.trim() ?? '?';
+    const content =
+      element
+        .querySelector('div.col-xs-12.col-sm-8 > div.field-content')
+        ?.textContent?.trim()
+        .slice(0, 500) ?? '?';
+    const image =
+      element.querySelector('img')?.getAttribute('src')?.split('?').at(0) ??
+      '?';
 
     const embed = new EmbedBuilder()
       .setTitle(title)
@@ -23,12 +29,15 @@ export class ProjectsStrategy implements ScraperStrategy {
     return [link, embed];
   }
 
-  public getRequestInit (): RequestInit | undefined {
+  public getRequestInit(): RequestInit | undefined {
     return undefined;
   }
 
-  public getId (e: Element): string | null {
-    const url = e.querySelector(this.idsSelector)?.getAttribute('href')?.trim();
+  public getId(element: Element): string | null {
+    const url = element
+      .querySelector(this.idsSelector)
+      ?.getAttribute('href')
+      ?.trim();
     return url === undefined ? null : `https://finki.ukim.mk${url}`;
   }
 }
