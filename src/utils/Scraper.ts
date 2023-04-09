@@ -11,7 +11,7 @@ import { JSDOM } from 'jsdom';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
-import { type Logger } from 'winston';
+import { type Logger } from 'pino';
 
 export class Scraper {
   private readonly strategy: ScraperStrategy;
