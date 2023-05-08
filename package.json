@@ -9,7 +9,7 @@
     "start:dev": "npm run lint && npm run build && npm run start"
   },
   "dependencies": {
-    "discord.js": "^14.10.2",
+    "discord.js": "^14.11.0",
     "jsdom": "^22.0.0",
     "pino": "^8.12.1",
     "pino-pretty": "^10.0.0",
