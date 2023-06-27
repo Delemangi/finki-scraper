@@ -20,6 +20,6 @@
     "@types/jsdom": "^21.1.1",
     "eslint": "^8.43.0",
     "eslint-config-canonical": "^41.0.5",
-    "typescript": "^5.2.0-dev.20230622"
+    "typescript": "^5.2.0-dev.20230627"
   }
 }
