@@ -12,7 +12,7 @@
     "discord.js": "^14.13.0",
     "jsdom": "^22.1.0",
     "pino": "^8.15.1",
-    "pino-pretty": "^10.2.0",
+    "pino-pretty": "^10.2.2",
     "rimraf": "^5.0.1"
   },
   "type": "module",
