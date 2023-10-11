@@ -13,7 +13,7 @@
     "jsdom": "^22.1.0",
     "pino": "^8.16.0",
     "pino-pretty": "^10.2.3",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.5"
   },
   "type": "module",
   "devDependencies": {
