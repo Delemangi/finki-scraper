@@ -1,22 +1,22 @@
-import { join } from 'node:path';
-import { pino } from 'pino';
+import { join } from "node:path";
+import { pino } from "pino";
 
 const transport = pino.transport({
   targets: [
     {
-      level: 'info',
+      level: "info",
       options: {
         colorize: true,
         translateTime: true,
       },
-      target: 'pino-pretty',
+      target: "pino-pretty",
     },
     {
-      level: 'info',
+      level: "info",
       options: {
-        destination: join('.', 'bot.log'),
+        destination: join(".", "bot.log"),
       },
-      target: 'pino/file',
+      target: "pino/file",
     },
   ],
 });

@@ -1,69 +1,69 @@
-import { config } from '../utils/config.js';
-import { EmbedBuilder } from 'discord.js';
+import { config } from "../utils/config.js";
+import { EmbedBuilder } from "discord.js";
 
 export class DiplomasStrategy implements ScraperStrategy {
-  public postsSelector = 'div.panel';
+  public postsSelector = "div.panel";
 
-  public idsSelector = 'div.panel-heading';
+  public idsSelector = "div.panel-heading";
 
   public defaultCookie = config.diplomasCookie;
 
   public getPostData(element: Element): [string | null, EmbedBuilder] {
     const title =
-      element.querySelector('div.panel-heading')?.textContent?.trim() ?? '?';
+      element.querySelector("div.panel-heading")?.textContent?.trim() ?? "?";
     const [index, student] = element
       .querySelector(
-        'div.panel-body > table tr:nth-of-type(1) > td:nth-of-type(2)',
+        "div.panel-body > table tr:nth-of-type(1) > td:nth-of-type(2)",
       )
       ?.textContent?.trim()
-      .split(' - ') ?? ['?', '?'];
+      .split(" - ") ?? ["?", "?"];
     const mentor =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(2) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(2) > td:nth-of-type(2)",
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent?.trim() ?? "?";
     const member1 =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(3) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(3) > td:nth-of-type(2)",
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent?.trim() ?? "?";
     const member2 =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(4) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(4) > td:nth-of-type(2)",
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent?.trim() ?? "?";
     const date =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(5) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(5) > td:nth-of-type(2)",
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent?.trim() ?? "?";
     const status =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(6) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(6) > td:nth-of-type(2)",
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent?.trim() ?? "?";
     const url =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(7) > td:nth-of-type(2) a',
+          "div.panel-body > table tr:nth-of-type(7) > td:nth-of-type(2) a",
         )
-        ?.getAttribute('href') ?? null;
+        ?.getAttribute("href") ?? null;
     const link =
-      url === null || url.includes('javascript')
+      url === null || url.includes("javascript")
         ? null
         : `http://diplomski.finki.ukim.mk/${url}`;
     const content =
       element
         .querySelector(
-          'div.panel-body > table tr:nth-of-type(8) > td:nth-of-type(2)',
+          "div.panel-body > table tr:nth-of-type(8) > td:nth-of-type(2)",
         )
         ?.textContent?.trim()
-        .slice(0, 500) ?? '?';
+        .slice(0, 500) ?? "?";
 
     const embed = new EmbedBuilder()
       .setTitle(title)
@@ -74,32 +74,32 @@ export class DiplomasStrategy implements ScraperStrategy {
       .addFields([
         {
           inline: true,
-          name: 'Ментор',
+          name: "Ментор",
           value: mentor,
         },
         {
           inline: true,
-          name: 'Член 1',
+          name: "Член 1",
           value: member1,
         },
         {
           inline: true,
-          name: 'Член 2',
+          name: "Член 2",
           value: member2,
         },
         {
           inline: true,
-          name: 'Датум',
+          name: "Датум",
           value: date,
         },
         {
           inline: true,
-          name: 'Статус',
+          name: "Статус",
           value: status,
         },
       ])
-      .setDescription(content === '' ? 'Нема опис.' : content)
-      .setColor('#313183')
+      .setDescription(content === "" ? "Нема опис." : content)
+      .setColor("#313183")
       .setTimestamp();
 
     return [title, embed];
@@ -107,7 +107,7 @@ export class DiplomasStrategy implements ScraperStrategy {
 
   public getRequestInit(cookie: string): RequestInit {
     return {
-      credentials: 'same-origin',
+      credentials: "same-origin",
       headers: { Cookie: cookie },
     };
   }

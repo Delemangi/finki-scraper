@@ -1,17 +1,17 @@
-import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
-import { CourseStrategy } from '../strategies/CourseStrategy.js';
-import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
-import { EventsStrategy } from '../strategies/EventsStrategy.js';
-import { JobsStrategy } from '../strategies/JobsStrategy.js';
-import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
-import { config } from './config.js';
-import { logger } from './logger.js';
-import { roleMention, WebhookClient } from 'discord.js';
-import { JSDOM } from 'jsdom';
-import { existsSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { setTimeout } from 'node:timers/promises';
-import { type Logger } from 'pino';
+import { AnnouncementsStrategy } from "../strategies/AnnouncementsStrategy.js";
+import { CourseStrategy } from "../strategies/CourseStrategy.js";
+import { DiplomasStrategy } from "../strategies/DiplomasStrategy.js";
+import { EventsStrategy } from "../strategies/EventsStrategy.js";
+import { JobsStrategy } from "../strategies/JobsStrategy.js";
+import { ProjectsStrategy } from "../strategies/ProjectsStrategy.js";
+import { config } from "./config.js";
+import { logger } from "./logger.js";
+import { roleMention, WebhookClient } from "discord.js";
+import { JSDOM } from "jsdom";
+import { existsSync } from "node:fs";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { setTimeout } from "node:timers/promises";
+import { type Logger } from "pino";
 
 export class Scraper {
   private readonly strategy: ScraperStrategy;
@@ -50,17 +50,17 @@ export class Scraper {
     scraperName: string,
   ): ScraperStrategy {
     switch (strategyName) {
-      case 'announcements':
+      case "announcements":
         return new AnnouncementsStrategy();
-      case 'course':
+      case "course":
         return new CourseStrategy();
-      case 'events':
+      case "events":
         return new EventsStrategy();
-      case 'jobs':
+      case "jobs":
         return new JobsStrategy();
-      case 'projects':
+      case "projects":
         return new ProjectsStrategy();
-      case 'diplomas':
+      case "diplomas":
         return new DiplomasStrategy();
       default:
         throw new Error(
@@ -72,7 +72,7 @@ export class Scraper {
   public static getCookie(cookie: { [index: string]: string }): string {
     return Object.entries(cookie)
       .map(([key, value]) => `${key}=${value}`)
-      .join('; ');
+      .join("; ");
   }
 
   public async run() {
@@ -112,18 +112,18 @@ export class Scraper {
         continue;
       }
 
-      if (!existsSync('cache')) {
-        await mkdir('cache');
+      if (!existsSync("cache")) {
+        await mkdir("cache");
       }
 
       const cache = (
         await readFile(`./cache/${this.scraperName}`, {
-          encoding: 'utf8',
-          flag: 'a+',
+          encoding: "utf8",
+          flag: "a+",
         })
       )
         .trim()
-        .split('\n');
+        .split("\n");
 
       const dom = new JSDOM(text);
       const posts = Array.from(
@@ -159,8 +159,8 @@ export class Scraper {
           await this.webhook.send({
             content:
               this.scraperConfig.role === undefined ||
-              this.scraperConfig.role === ''
-                ? ''
+              this.scraperConfig.role === ""
+                ? ""
                 : roleMention(this.scraperConfig.role),
             embeds: [embed],
             ...(this.scraperConfig.name !== undefined && {
@@ -175,9 +175,9 @@ export class Scraper {
         }
       }
 
-      await writeFile(`./cache/${this.scraperName}`, ids.join('\n'), {
-        encoding: 'utf8',
-        flag: 'w',
+      await writeFile(`./cache/${this.scraperName}`, ids.join("\n"), {
+        encoding: "utf8",
+        flag: "w",
       });
 
       this.logger.info(`[${this.scraperName}] Finished`);

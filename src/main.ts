@@ -1,13 +1,13 @@
-import { config } from './utils/config.js';
-import { logger } from './utils/logger.js';
-import { Scraper } from './utils/Scraper.js';
-import { argv } from 'node:process';
-import { setTimeout } from 'node:timers/promises';
+import { config } from "./utils/config.js";
+import { logger } from "./utils/logger.js";
+import { Scraper } from "./utils/Scraper.js";
+import { argv } from "node:process";
+import { setTimeout } from "node:timers/promises";
 
 const names = argv.slice(2);
 
 logger.info(
-  `Initializing ${names.length === 0 ? 'all' : names.length} scrapers`,
+  `Initializing ${names.length === 0 ? "all" : names.length} scrapers`,
 );
 
 const scrapers =
