@@ -4,6 +4,8 @@ import { DiplomasStrategy } from "../strategies/DiplomasStrategy.js";
 import { EventsStrategy } from "../strategies/EventsStrategy.js";
 import { JobsStrategy } from "../strategies/JobsStrategy.js";
 import { ProjectsStrategy } from "../strategies/ProjectsStrategy.js";
+import { type ScraperConfig } from "../types/ScraperConfig.js";
+import { type ScraperStrategy } from "../types/ScraperStrategy.js";
 import { config } from "./config.js";
 import { logger } from "./logger.js";
 import { roleMention, WebhookClient } from "discord.js";
@@ -27,13 +29,12 @@ export class Scraper {
   private readonly logger: Logger;
 
   public constructor(scraperName: string) {
-    if (!Object.keys(config.scrapers).includes(scraperName)) {
+    if (config.scrapers[scraperName] === undefined) {
       throw new Error(`[${scraperName}] Scraper not found in config`);
     }
 
     this.scraperName = scraperName;
-    // @ts-expect-error this is a valid property
-    this.scraperConfig = config.scrapers[scraperName];
+    this.scraperConfig = config.scrapers[scraperName] as ScraperConfig;
     this.strategy = Scraper.getStrategy(
       this.scraperConfig.strategy,
       this.scraperName,

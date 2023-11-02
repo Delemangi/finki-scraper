@@ -1,3 +1,4 @@
+import { type ScraperStrategy } from "../types/ScraperStrategy.js";
 import { config } from "../utils/config.js";
 import { EmbedBuilder } from "discord.js";
 
