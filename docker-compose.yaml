@@ -5,7 +5,7 @@ services:
     container_name: finki-scraper
     image: finki-scraper
     build: .
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./cache:/app/cache
       - ./config:/app/config
