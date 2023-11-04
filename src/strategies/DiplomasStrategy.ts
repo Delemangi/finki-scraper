@@ -1,5 +1,5 @@
-import { type ScraperStrategy } from "../types/ScraperStrategy.js";
-import { config } from "../utils/config.js";
+import { type ScraperStrategy } from "../types/Scraper.js";
+import { getConfigProperty } from "../utils/config.js";
 import { EmbedBuilder } from "discord.js";
 
 export class DiplomasStrategy implements ScraperStrategy {
@@ -7,7 +7,7 @@ export class DiplomasStrategy implements ScraperStrategy {
 
   public idsSelector = "div.panel-heading";
 
-  public defaultCookie = config.diplomasCookie;
+  public defaultCookie = getConfigProperty("diplomasCookie");
 
   public getPostData(element: Element): [string | null, EmbedBuilder] {
     const title =

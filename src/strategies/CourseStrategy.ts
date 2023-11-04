@@ -1,5 +1,5 @@
-import { type ScraperStrategy } from "../types/ScraperStrategy.js";
-import { config } from "../utils/config.js";
+import { type ScraperStrategy } from "../types/Scraper.js";
+import { getConfigProperty } from "../utils/config.js";
 import { EmbedBuilder } from "discord.js";
 
 export class CourseStrategy implements ScraperStrategy {
@@ -7,7 +7,7 @@ export class CourseStrategy implements ScraperStrategy {
 
   public idsSelector = '[title="Permanent link to this post"]';
 
-  public defaultCookie = config.coursesCookie;
+  public defaultCookie = getConfigProperty("coursesCookie");
 
   public getPostData(element: Element): [string | null, EmbedBuilder] {
     const link =

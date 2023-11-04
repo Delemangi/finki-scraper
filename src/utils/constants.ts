@@ -8,6 +8,7 @@ export const messages = {
 
 export const errors = {
   badResponseCode: "Bad response code",
+  configParseFailed: "Failed to parse config.json file",
   fetchFailed: "Failed to fetch",
   fetchParseFailed: "Failed to parse fetch result",
   postSendFailed: "Failed to send post",

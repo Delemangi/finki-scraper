@@ -1,10 +1,5 @@
-import { type ScraperConfig } from "./ScraperConfig.js";
+import { type ConfigSchema } from "../schema/ConfigSchema.js";
+import { type z } from "zod";
 
-export type Config = {
-  coursesCookie: Record<string, string>;
-  diplomasCookie: Record<string, string>;
-  errorDelay: number;
-  maxPosts: number;
-  scrapers: Record<string, ScraperConfig>;
-  successDelay: number;
-};
+export type Config = z.infer<typeof ConfigSchema>;
+export type ConfigKeys = keyof Config;

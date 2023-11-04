@@ -4,9 +4,8 @@ import { DiplomasStrategy } from "../strategies/DiplomasStrategy.js";
 import { EventsStrategy } from "../strategies/EventsStrategy.js";
 import { JobsStrategy } from "../strategies/JobsStrategy.js";
 import { ProjectsStrategy } from "../strategies/ProjectsStrategy.js";
-import { type ScraperConfig } from "../types/ScraperConfig.js";
-import { type ScraperStrategy } from "../types/ScraperStrategy.js";
-import { config } from "./config.js";
+import { type ScraperConfig, type ScraperStrategy } from "../types/Scraper.js";
+import { getConfigProperty } from "./config.js";
 import { cachePath, errors, messages, strategies } from "./constants.js";
 import { logger } from "./logger.js";
 import { roleMention, WebhookClient } from "discord.js";
@@ -30,12 +29,14 @@ export class Scraper {
   private readonly logger: Logger;
 
   public constructor(scraperName: string) {
-    if (config.scrapers[scraperName] === undefined) {
+    if (getConfigProperty("scrapers")[scraperName] === undefined) {
       throw new Error(`[${scraperName}] ${errors.scraperNotFound}`);
     }
 
     this.scraperName = scraperName;
-    this.scraperConfig = config.scrapers[scraperName] as ScraperConfig;
+    this.scraperConfig = getConfigProperty("scrapers")[
+      scraperName
+    ] as ScraperConfig;
     this.strategy = Scraper.getStrategy(this.scraperConfig.strategy);
     this.webhook = new WebhookClient({ url: this.scraperConfig.webhook });
     this.cookie = Scraper.getCookie(
@@ -88,7 +89,7 @@ export class Scraper {
         this.logger.warn(
           `[${this.scraperName}] ${errors.fetchFailed}\n${error}`,
         );
-        await setTimeout(config.errorDelay);
+        await setTimeout(getConfigProperty("errorDelay"));
         continue;
       }
 
@@ -100,7 +101,7 @@ export class Scraper {
         this.logger.warn(
           `[${this.scraperName}] ${errors.fetchParseFailed}\n${error}`,
         );
-        await setTimeout(config.errorDelay);
+        await setTimeout(getConfigProperty("errorDelay"));
         continue;
       }
 
@@ -108,7 +109,7 @@ export class Scraper {
         this.logger.warn(
           `[${this.scraperName}] ${errors.badResponseCode}: ${response.status}`,
         );
-        await setTimeout(config.errorDelay);
+        await setTimeout(getConfigProperty("errorDelay"));
         continue;
       }
 
@@ -128,11 +129,11 @@ export class Scraper {
       const dom = new JSDOM(text);
       const posts = Array.from(
         dom.window.document.querySelectorAll(this.strategy.postsSelector),
-      ).slice(0, config.maxPosts);
+      ).slice(0, getConfigProperty("maxPosts"));
 
       if (posts.length === 0) {
         this.logger.warn(`[${this.scraperName}] ${errors.postsNotFound}`);
-        await setTimeout(config.errorDelay);
+        await setTimeout(getConfigProperty("errorDelay"));
         continue;
       }
 
@@ -143,7 +144,7 @@ export class Scraper {
         ids.every((value) => value === null || cache.includes(value))
       ) {
         this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
-        await setTimeout(config.successDelay);
+        await setTimeout(getConfigProperty("successDelay"));
         continue;
       }
 
@@ -183,7 +184,7 @@ export class Scraper {
       });
 
       this.logger.info(`[${this.scraperName}] Finished`);
-      await setTimeout(config.successDelay);
+      await setTimeout(getConfigProperty("successDelay"));
     }
   }
 }

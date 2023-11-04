@@ -1,4 +1,4 @@
-import { type ScraperStrategy } from "../types/ScraperStrategy.js";
+import { type ScraperStrategy } from "../types/Scraper.js";
 import { EmbedBuilder } from "discord.js";
 
 export class ProjectsStrategy implements ScraperStrategy {
