@@ -17,4 +17,5 @@ export const ConfigSchema = z.object({
     }),
   ),
   successDelay: z.number().optional(),
+  webhook: z.string(),
 });

@@ -26,6 +26,8 @@ export class Scraper {
 
   private readonly webhook: WebhookClient;
 
+  private readonly globalWebhook: WebhookClient;
+
   private readonly logger: Logger;
 
   public constructor(scraperName: string) {
@@ -39,6 +41,9 @@ export class Scraper {
     ] as ScraperConfig;
     this.strategy = Scraper.getStrategy(this.scraperConfig.strategy);
     this.webhook = new WebhookClient({ url: this.scraperConfig.webhook });
+    this.globalWebhook = new WebhookClient({
+      url: getConfigProperty("webhook"),
+    });
     this.cookie = Scraper.getCookie(
       this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {},
     );
@@ -74,6 +79,7 @@ export class Scraper {
     return `./${cachePath}/${this.scraperName}`;
   }
 
+  // eslint-disable-next-line complexity
   public async run() {
     while (true) {
       this.logger.info(`[${this.scraperName}] ${messages.searching}`);
@@ -86,10 +92,18 @@ export class Scraper {
           this.strategy.getRequestInit(this.cookie),
         );
       } catch (error) {
-        this.logger.warn(
+        this.logger.error(
           `[${this.scraperName}] ${errors.fetchFailed}\n${error}`,
         );
+        await this.globalWebhook.send({
+          content: errors.fetchFailed,
+          ...(this.scraperConfig.name !== undefined && {
+            username: this.scraperConfig.name,
+          }),
+        });
+
         await setTimeout(getConfigProperty("errorDelay"));
+
         continue;
       }
 
@@ -98,10 +112,18 @@ export class Scraper {
       try {
         text = await response.text();
       } catch (error) {
-        this.logger.warn(
+        this.logger.error(
           `[${this.scraperName}] ${errors.fetchParseFailed}\n${error}`,
         );
+        await this.globalWebhook.send({
+          content: errors.fetchParseFailed,
+          ...(this.scraperConfig.name !== undefined && {
+            username: this.scraperConfig.name,
+          }),
+        });
+
         await setTimeout(getConfigProperty("errorDelay"));
+
         continue;
       }
 
@@ -109,7 +131,15 @@ export class Scraper {
         this.logger.warn(
           `[${this.scraperName}] ${errors.badResponseCode}: ${response.status}`,
         );
+        await this.globalWebhook.send({
+          content: `${errors.badResponseCode}: ${response.status}`,
+          ...(this.scraperConfig.name !== undefined && {
+            username: this.scraperConfig.name,
+          }),
+        });
+
         await setTimeout(getConfigProperty("errorDelay"));
+
         continue;
       }
 
@@ -133,7 +163,15 @@ export class Scraper {
 
       if (posts.length === 0) {
         this.logger.warn(`[${this.scraperName}] ${errors.postsNotFound}`);
+        await this.globalWebhook.send({
+          content: errors.postsNotFound,
+          ...(this.scraperConfig.name !== undefined && {
+            username: this.scraperConfig.name,
+          }),
+        });
+
         await setTimeout(getConfigProperty("errorDelay"));
+
         continue;
       }
 
@@ -144,7 +182,9 @@ export class Scraper {
         ids.every((value) => value === null || cache.includes(value))
       ) {
         this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
+
         await setTimeout(getConfigProperty("successDelay"));
+
         continue;
       }
 
@@ -155,6 +195,7 @@ export class Scraper {
           this.logger.info(
             `[${this.scraperName}] ${messages.postAlreadySent}: ${id}`,
           );
+
           continue;
         }
 
@@ -166,15 +207,17 @@ export class Scraper {
                 ? ""
                 : roleMention(this.scraperConfig.role),
             embeds: [embed],
-            ...(this.scraperConfig.name !== undefined && {
-              username: this.scraperConfig.name,
-            }),
+            username: this.scraperConfig.name ?? this.scraperName,
           });
           this.logger.info(`[${this.scraperName}] ${messages.postSent}: ${id}`);
         } catch (error) {
           this.logger.error(
             `[${this.scraperName}] ${errors.postSendFailed}: ${id}\n${error}`,
           );
+          await this.globalWebhook.send({
+            content: `${errors.postSendFailed}: ${id}`,
+            username: this.scraperConfig.name ?? this.scraperName,
+          });
         }
       }
 
