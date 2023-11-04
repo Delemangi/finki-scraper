@@ -1,4 +1,5 @@
 import { config } from "./utils/config.js";
+import { messages } from "./utils/constants.js";
 import { logger } from "./utils/logger.js";
 import { Scraper } from "./utils/Scraper.js";
 import { argv } from "node:process";
@@ -6,9 +7,7 @@ import { setTimeout } from "node:timers/promises";
 
 const names = argv.slice(2);
 
-logger.info(
-  `Initializing ${names.length === 0 ? "all" : names.length} scrapers`,
-);
+logger.info(messages.initializing);
 
 const scrapers =
   names.length === 0
@@ -19,5 +18,6 @@ const scrapers =
 
 for (const scraper of scrapers) {
   void scraper.run();
+
   await setTimeout(1_000);
 }
