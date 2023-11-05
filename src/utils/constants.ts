@@ -11,6 +11,7 @@ export const errors = {
   configParseFailed: "Failed to parse config.json file",
   fetchFailed: "Failed to fetch",
   fetchParseFailed: "Failed to parse fetch result",
+  postIdNotFound: "Post ID not found",
   postSendFailed: "Failed to send post",
   postsNotFound: "Posts not found",
   scraperNotFound: "Scraper not found",

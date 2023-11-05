@@ -8,7 +8,7 @@ import { type ScraperConfig, type ScraperStrategy } from "../types/Scraper.js";
 import { getConfigProperty } from "./config.js";
 import { cachePath, errors, messages, strategies } from "./constants.js";
 import { logger } from "./logger.js";
-import { roleMention, WebhookClient } from "discord.js";
+import { type EmbedBuilder, roleMention, WebhookClient } from "discord.js";
 import { JSDOM } from "jsdom";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -75,6 +75,39 @@ export class Scraper {
     }
   }
 
+  public async run() {
+    while (true) {
+      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+      try {
+        const response = await this.fetchData();
+        const text = await this.getTextFromResponse(response);
+
+        this.checkStatusCode(response.status);
+
+        const fullCachePath = this.getFullCachePath();
+        const cache = await this.readCacheFile(fullCachePath);
+        const posts = this.getPostsFromDOM(text);
+        const ids = this.getIdsFromPosts(posts);
+
+        if (this.hasNoNewPosts(ids, cache)) {
+          await this.handleNoNewPosts();
+
+          continue;
+        }
+
+        await this.processNewPosts(posts, cache);
+        await this.writeCacheFile(cachePath, ids);
+      } catch (error) {
+        await this.handleError(`${error}`);
+
+        await this.delay(getConfigProperty("errorDelay") as number);
+      }
+
+      await this.delay(getConfigProperty("successDelay") as number);
+    }
+  }
+
   public getCookie(): string {
     const cookie =
       this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {};
@@ -84,151 +117,132 @@ export class Scraper {
       .join("; ");
   }
 
-  public getFullCachePath(): string {
+  private async fetchData(): Promise<Response> {
+    try {
+      return await fetch(
+        this.scraperConfig.link,
+        this.strategy.getRequestInit(this.cookie),
+      );
+    } catch {
+      throw new Error(errors.fetchFailed);
+    }
+  }
+
+  private async getTextFromResponse(response: Response) {
+    try {
+      return await response.text();
+    } catch {
+      throw new Error(errors.fetchParseFailed);
+    }
+  }
+
+  private checkStatusCode(statusCode: number) {
+    if (statusCode !== 200) {
+      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
+    }
+  }
+
+  private getFullCachePath(): string {
     return `./${cachePath}/${this.scraperName}`;
   }
 
-  // eslint-disable-next-line complexity
-  public async run() {
-    while (true) {
-      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
-
-      let response: Response;
-
-      try {
-        response = await fetch(
-          this.scraperConfig.link,
-          this.strategy.getRequestInit(this.cookie),
-        );
-      } catch (error) {
-        this.logger.error(
-          `[${this.scraperName}] ${errors.fetchFailed}\n${error}`,
-        );
-        await this.globalWebhook?.send({
-          content: errors.fetchFailed,
-          username: this.scraperConfig.name ?? this.scraperName,
-        });
-
-        await setTimeout(getConfigProperty("errorDelay"));
-
-        continue;
-      }
-
-      let text: string;
-
-      try {
-        text = await response.text();
-      } catch (error) {
-        this.logger.error(
-          `[${this.scraperName}] ${errors.fetchParseFailed}\n${error}`,
-        );
-        await this.globalWebhook?.send({
-          content: errors.fetchParseFailed,
-          username: this.scraperConfig.name ?? this.scraperName,
-        });
-
-        await setTimeout(getConfigProperty("errorDelay"));
-
-        continue;
-      }
-
-      if (!response.ok) {
-        this.logger.warn(
-          `[${this.scraperName}] ${errors.badResponseCode}: ${response.status}`,
-        );
-        await this.globalWebhook?.send({
-          content: `${errors.badResponseCode}: ${response.status}`,
-          username: this.scraperConfig.name ?? this.scraperName,
-        });
-
-        await setTimeout(getConfigProperty("errorDelay"));
-
-        continue;
-      }
-
-      if (!existsSync(cachePath)) {
-        await mkdir(cachePath);
-      }
-
-      const cache = (
-        await readFile(this.getFullCachePath(), {
-          encoding: "utf8",
-          flag: "a+",
-        })
-      )
-        .trim()
-        .split("\n");
-
-      const dom = new JSDOM(text);
-      const posts = Array.from(
-        dom.window.document.querySelectorAll(this.strategy.postsSelector),
-      ).slice(0, getConfigProperty("maxPosts"));
-
-      if (posts.length === 0) {
-        this.logger.warn(`[${this.scraperName}] ${errors.postsNotFound}`);
-        await this.globalWebhook?.send({
-          content: errors.postsNotFound,
-          username: this.scraperConfig.name ?? this.scraperName,
-        });
-
-        await setTimeout(getConfigProperty("errorDelay"));
-
-        continue;
-      }
-
-      const ids = posts.map((post) => this.strategy.getId(post));
-
-      if (
-        ids.length === cache.length &&
-        ids.every((value) => value === null || cache.includes(value))
-      ) {
-        this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
-
-        await setTimeout(getConfigProperty("successDelay"));
-
-        continue;
-      }
-
-      for (const post of [...posts].reverse().slice(0.3 * posts.length)) {
-        const [id, embed] = this.strategy.getPostData(post);
-
-        if (id === null || cache.includes(id)) {
-          this.logger.info(
-            `[${this.scraperName}] ${messages.postAlreadySent}: ${id}`,
-          );
-
-          continue;
-        }
-
-        try {
-          await this.webhook?.send({
-            content:
-              this.scraperConfig.role === undefined ||
-              this.scraperConfig.role === ""
-                ? ""
-                : roleMention(this.scraperConfig.role),
-            embeds: [embed],
-            username: this.scraperConfig.name ?? this.scraperName,
-          });
-          this.logger.info(`[${this.scraperName}] ${messages.postSent}: ${id}`);
-        } catch (error) {
-          this.logger.error(
-            `[${this.scraperName}] ${errors.postSendFailed}: ${id}\n${error}`,
-          );
-          await this.globalWebhook?.send({
-            content: `${errors.postSendFailed}: ${id}`,
-            username: this.scraperConfig.name ?? this.scraperName,
-          });
-        }
-      }
-
-      await writeFile(this.getFullCachePath(), ids.join("\n"), {
-        encoding: "utf8",
-        flag: "w",
-      });
-
-      this.logger.info(`[${this.scraperName}] Finished`);
-      await setTimeout(getConfigProperty("successDelay"));
+  private async readCacheFile(path: string) {
+    if (!existsSync(path)) {
+      await mkdir(path);
     }
+
+    const content = await readFile(path, { encoding: "utf8", flag: "a+" });
+
+    return content.trim().split("\n");
+  }
+
+  private getPostsFromDOM(html: string) {
+    const dom = new JSDOM(html);
+    const posts = Array.from(
+      dom.window.document.querySelectorAll(this.strategy.postsSelector),
+    );
+
+    const lastPosts = posts.slice(0, getConfigProperty("maxPosts"));
+
+    if (lastPosts.length === 0) {
+      throw new Error(errors.postsNotFound);
+    }
+
+    return lastPosts;
+  }
+
+  private getIdsFromPosts(posts: Element[]) {
+    return posts.map((post) => this.strategy.getId(post));
+  }
+
+  private hasNoNewPosts(ids: Array<string | null>, cache: string[]) {
+    return (
+      ids.length === cache.length &&
+      ids.every((value) => value === null || cache.includes(value))
+    );
+  }
+
+  private async handleNoNewPosts() {
+    this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
+
+    await this.delay(getConfigProperty("successDelay") as number);
+  }
+
+  private async processNewPosts(posts: Element[], cache: string[]) {
+    const allPosts = [...posts].reverse().slice(0.3 * posts.length);
+
+    for (const post of allPosts) {
+      const [id, embed] = this.strategy.getPostData(post);
+
+      if (id === null) {
+        await this.handleError(
+          `${errors.postIdNotFound}: ${embed.data.title ?? "Unknown"}`,
+        );
+
+        continue;
+      }
+
+      if (cache.includes(id)) {
+        this.logger.info(
+          `[${this.scraperName}] ${messages.postAlreadySent}: ${id}`,
+        );
+
+        continue;
+      }
+
+      try {
+        await this.sendPost(embed, id);
+      } catch {
+        await this.handleError(`${errors.postSendFailed}: ${id}`);
+      }
+    }
+  }
+
+  private async sendPost(embed: EmbedBuilder, id: string) {
+    await this.webhook?.send({
+      content:
+        this.scraperConfig.role === undefined || this.scraperConfig.role === ""
+          ? ""
+          : roleMention(this.scraperConfig.role),
+      embeds: [embed],
+      username: this.scraperConfig.name ?? this.scraperName,
+    });
+    this.logger.info(`[${this.scraperName}] ${messages.postSent}: ${id}`);
+  }
+
+  private async writeCacheFile(path: string, ids: Array<string | null>) {
+    await writeFile(path, ids.join("\n"), { encoding: "utf8", flag: "w" });
+  }
+
+  private async handleError(message: string) {
+    this.logger.error(`[${this.scraperName}] ${message}`);
+    await this.globalWebhook?.send({
+      content: `${this.scraperName}: ${message}`,
+      username: this.scraperConfig.name ?? this.scraperName,
+    });
+  }
+
+  private async delay(milliseconds: number) {
+    await setTimeout(milliseconds);
   }
 }
