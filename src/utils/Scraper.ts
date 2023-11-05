@@ -73,6 +73,17 @@ export class Scraper {
     }
   }
 
+  public async runOnce() {
+    this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+    try {
+      return await this.getAndSendPosts();
+    } catch (error) {
+      await this.handleError(`${error}`);
+      return null;
+    }
+  }
+
   private async getAndSendPosts() {
     const response = await this.fetchData();
 
