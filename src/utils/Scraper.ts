@@ -31,14 +31,14 @@ export class Scraper {
   private readonly logger: Logger;
 
   public constructor(scraperName: string) {
-    if (getConfigProperty("scrapers")[scraperName] === undefined) {
+    const scraper = getConfigProperty("scrapers")[scraperName];
+
+    if (scraper === undefined) {
       throw new Error(`[${scraperName}] ${errors.scraperNotFound}`);
     }
 
     this.scraperName = scraperName;
-    this.scraperConfig = getConfigProperty("scrapers")[
-      scraperName
-    ] as ScraperConfig;
+    this.scraperConfig = scraper as ScraperConfig;
     this.strategy = this.getStrategy();
     this.cookie = this.getCookie();
     this.logger = logger;
