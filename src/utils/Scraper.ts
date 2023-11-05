@@ -79,8 +79,7 @@ export class Scraper {
     this.checkStatusCode(response.status);
 
     const text = await this.getTextFromResponse(response);
-    const fullCachePath = this.getFullCachePath();
-    const cache = await this.readCacheFile(fullCachePath);
+    const cache = await this.readCacheFile();
     const posts = this.getPostsFromDOM(text);
     const ids = this.getIdsFromPosts(posts);
 
@@ -91,7 +90,7 @@ export class Scraper {
     }
 
     const validPosts = await this.processNewPosts(posts, cache);
-    await this.writeCacheFile(cachePath, ids);
+    await this.writeCacheFile(this.getFullCachePath(), ids);
 
     return validPosts;
   }
@@ -153,12 +152,17 @@ export class Scraper {
     return `./${cachePath}/${this.scraperName}`;
   }
 
-  private async readCacheFile(path: string) {
-    if (!existsSync(path)) {
-      await mkdir(path);
+  private async readCacheFile() {
+    if (!existsSync(cachePath)) {
+      await mkdir(cachePath, {
+        recursive: true,
+      });
     }
 
-    const content = await readFile(path, { encoding: "utf8", flag: "a+" });
+    const content = await readFile(this.getFullCachePath(), {
+      encoding: "utf8",
+      flag: "a+",
+    });
 
     return content.trim().split("\n");
   }
