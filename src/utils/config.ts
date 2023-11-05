@@ -15,8 +15,17 @@ const initializeConfig = () => {
 
 const config = initializeConfig();
 
+const defaultConfig: Config = {
+  coursesCookie: {},
+  diplomasCookie: {},
+  errorDelay: 60_000,
+  maxPosts: 20,
+  scrapers: {},
+  successDelay: 180_000,
+};
+
 export const getConfigProperty = <T extends ConfigKeys>(
   property: T,
 ): Config[T] => {
-  return config[property];
+  return config[property] ?? defaultConfig[property];
 };
