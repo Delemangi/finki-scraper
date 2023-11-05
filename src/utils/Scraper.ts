@@ -240,7 +240,7 @@ export class Scraper {
   private async handleError(message: string) {
     this.logger.error(`[${this.scraperName}] ${message}`);
     await this.globalWebhook?.send({
-      content: `${this.scraperName}: ${message}`,
+      content: message,
       username: this.scraperConfig.name ?? this.scraperName,
     });
   }
