@@ -56,7 +56,45 @@ export class Scraper {
     }
   }
 
-  public getStrategy(): ScraperStrategy {
+  public async run() {
+    while (true) {
+      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+      try {
+        await this.getAndSendPosts();
+      } catch (error) {
+        await this.handleError(`${error}`);
+        await this.delay(getConfigProperty("errorDelay") as number);
+      }
+
+      await this.delay(getConfigProperty("successDelay") as number);
+    }
+  }
+
+  private async getAndSendPosts() {
+    const response = await this.fetchData();
+
+    this.checkStatusCode(response.status);
+
+    const text = await this.getTextFromResponse(response);
+    const fullCachePath = this.getFullCachePath();
+    const cache = await this.readCacheFile(fullCachePath);
+    const posts = this.getPostsFromDOM(text);
+    const ids = this.getIdsFromPosts(posts);
+
+    if (this.hasNoNewPosts(ids, cache)) {
+      this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
+
+      return [];
+    }
+
+    const validPosts = await this.processNewPosts(posts, cache);
+    await this.writeCacheFile(cachePath, ids);
+
+    return validPosts;
+  }
+
+  private getStrategy(): ScraperStrategy {
     switch (this.scraperConfig.strategy) {
       case strategies.announcements:
         return new AnnouncementsStrategy();
@@ -75,40 +113,7 @@ export class Scraper {
     }
   }
 
-  public async run() {
-    while (true) {
-      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
-
-      try {
-        const response = await this.fetchData();
-        const text = await this.getTextFromResponse(response);
-
-        this.checkStatusCode(response.status);
-
-        const fullCachePath = this.getFullCachePath();
-        const cache = await this.readCacheFile(fullCachePath);
-        const posts = this.getPostsFromDOM(text);
-        const ids = this.getIdsFromPosts(posts);
-
-        if (this.hasNoNewPosts(ids, cache)) {
-          await this.handleNoNewPosts();
-
-          continue;
-        }
-
-        await this.processNewPosts(posts, cache);
-        await this.writeCacheFile(cachePath, ids);
-      } catch (error) {
-        await this.handleError(`${error}`);
-
-        await this.delay(getConfigProperty("errorDelay") as number);
-      }
-
-      await this.delay(getConfigProperty("successDelay") as number);
-    }
-  }
-
-  public getCookie(): string {
+  private getCookie(): string {
     const cookie =
       this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {};
 
@@ -128,17 +133,17 @@ export class Scraper {
     }
   }
 
+  private checkStatusCode(statusCode: number) {
+    if (statusCode !== 200) {
+      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
+    }
+  }
+
   private async getTextFromResponse(response: Response) {
     try {
       return await response.text();
     } catch {
       throw new Error(errors.fetchParseFailed);
-    }
-  }
-
-  private checkStatusCode(statusCode: number) {
-    if (statusCode !== 200) {
-      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
     }
   }
 
@@ -182,14 +187,9 @@ export class Scraper {
     );
   }
 
-  private async handleNoNewPosts() {
-    this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
-
-    await this.delay(getConfigProperty("successDelay") as number);
-  }
-
   private async processNewPosts(posts: Element[], cache: string[]) {
     const allPosts = [...posts].reverse().slice(0.3 * posts.length);
+    const validPosts: EmbedBuilder[] = [];
 
     for (const post of allPosts) {
       const [id, embed] = this.strategy.getPostData(post);
@@ -212,10 +212,13 @@ export class Scraper {
 
       try {
         await this.sendPost(embed, id);
+        validPosts.push(embed);
       } catch {
         await this.handleError(`${errors.postSendFailed}: ${id}`);
       }
     }
+
+    return validPosts.map((embed) => embed.data);
   }
 
   private async sendPost(embed: EmbedBuilder, id: string) {
