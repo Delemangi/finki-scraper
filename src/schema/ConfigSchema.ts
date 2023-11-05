@@ -13,9 +13,9 @@ export const ConfigSchema = z.object({
       name: z.string().optional(),
       role: z.string().optional(),
       strategy: z.string(),
-      webhook: z.string(),
+      webhook: z.string().optional(),
     }),
   ),
   successDelay: z.number().optional(),
-  webhook: z.string(),
+  webhook: z.string().optional(),
 });

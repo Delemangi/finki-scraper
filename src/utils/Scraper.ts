@@ -24,9 +24,9 @@ export class Scraper {
 
   private readonly cookie: string;
 
-  private readonly webhook: WebhookClient;
+  private readonly webhook?: WebhookClient;
 
-  private readonly globalWebhook: WebhookClient;
+  private readonly globalWebhook?: WebhookClient;
 
   private readonly logger: Logger;
 
@@ -39,19 +39,25 @@ export class Scraper {
     this.scraperConfig = getConfigProperty("scrapers")[
       scraperName
     ] as ScraperConfig;
-    this.strategy = Scraper.getStrategy(this.scraperConfig.strategy);
-    this.webhook = new WebhookClient({ url: this.scraperConfig.webhook });
-    this.globalWebhook = new WebhookClient({
-      url: getConfigProperty("webhook"),
-    });
-    this.cookie = Scraper.getCookie(
-      this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {},
-    );
+    this.strategy = this.getStrategy();
+    this.cookie = this.getCookie();
     this.logger = logger;
+
+    const webhookUrl = this.scraperConfig.webhook;
+
+    if (webhookUrl !== undefined) {
+      this.webhook = new WebhookClient({ url: webhookUrl });
+    }
+
+    const globalWebhookUrl = getConfigProperty("webhook");
+
+    if (globalWebhookUrl !== undefined) {
+      this.globalWebhook = new WebhookClient({ url: globalWebhookUrl });
+    }
   }
 
-  public static getStrategy(strategyName: string): ScraperStrategy {
-    switch (strategyName) {
+  public getStrategy(): ScraperStrategy {
+    switch (this.scraperConfig.strategy) {
       case strategies.announcements:
         return new AnnouncementsStrategy();
       case strategies.course:
@@ -69,7 +75,10 @@ export class Scraper {
     }
   }
 
-  public static getCookie(cookie: Record<string, string>): string {
+  public getCookie(): string {
+    const cookie =
+      this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {};
+
     return Object.entries(cookie)
       .map(([key, value]) => `${key}=${value}`)
       .join("; ");
@@ -95,11 +104,9 @@ export class Scraper {
         this.logger.error(
           `[${this.scraperName}] ${errors.fetchFailed}\n${error}`,
         );
-        await this.globalWebhook.send({
+        await this.globalWebhook?.send({
           content: errors.fetchFailed,
-          ...(this.scraperConfig.name !== undefined && {
-            username: this.scraperConfig.name,
-          }),
+          username: this.scraperConfig.name ?? this.scraperName,
         });
 
         await setTimeout(getConfigProperty("errorDelay"));
@@ -115,11 +122,9 @@ export class Scraper {
         this.logger.error(
           `[${this.scraperName}] ${errors.fetchParseFailed}\n${error}`,
         );
-        await this.globalWebhook.send({
+        await this.globalWebhook?.send({
           content: errors.fetchParseFailed,
-          ...(this.scraperConfig.name !== undefined && {
-            username: this.scraperConfig.name,
-          }),
+          username: this.scraperConfig.name ?? this.scraperName,
         });
 
         await setTimeout(getConfigProperty("errorDelay"));
@@ -131,11 +136,9 @@ export class Scraper {
         this.logger.warn(
           `[${this.scraperName}] ${errors.badResponseCode}: ${response.status}`,
         );
-        await this.globalWebhook.send({
+        await this.globalWebhook?.send({
           content: `${errors.badResponseCode}: ${response.status}`,
-          ...(this.scraperConfig.name !== undefined && {
-            username: this.scraperConfig.name,
-          }),
+          username: this.scraperConfig.name ?? this.scraperName,
         });
 
         await setTimeout(getConfigProperty("errorDelay"));
@@ -163,11 +166,9 @@ export class Scraper {
 
       if (posts.length === 0) {
         this.logger.warn(`[${this.scraperName}] ${errors.postsNotFound}`);
-        await this.globalWebhook.send({
+        await this.globalWebhook?.send({
           content: errors.postsNotFound,
-          ...(this.scraperConfig.name !== undefined && {
-            username: this.scraperConfig.name,
-          }),
+          username: this.scraperConfig.name ?? this.scraperName,
         });
 
         await setTimeout(getConfigProperty("errorDelay"));
@@ -200,7 +201,7 @@ export class Scraper {
         }
 
         try {
-          await this.webhook.send({
+          await this.webhook?.send({
             content:
               this.scraperConfig.role === undefined ||
               this.scraperConfig.role === ""
@@ -214,7 +215,7 @@ export class Scraper {
           this.logger.error(
             `[${this.scraperName}] ${errors.postSendFailed}: ${id}\n${error}`,
           );
-          await this.globalWebhook.send({
+          await this.globalWebhook?.send({
             content: `${errors.postSendFailed}: ${id}`,
             username: this.scraperConfig.name ?? this.scraperName,
           });
