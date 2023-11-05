@@ -65,6 +65,8 @@ export class Scraper {
       } catch (error) {
         await this.handleError(`${error}`);
         await this.delay(getConfigProperty("errorDelay") as number);
+
+        continue;
       }
 
       await this.delay(getConfigProperty("successDelay") as number);
