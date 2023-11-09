@@ -32,6 +32,10 @@ or
 or
 `npm run start s1 s2 ... sn`
 
+## Server Mode
+
+You can also run this app in server mode using `npm run serve`, which will boot up an Express based server which will open endpoints for receiving new announcements. The app will only scrape new announcements whenever it receives a request, instead of periodically scraping.
+
 ## Config
 
 Create a `config` folder and in it create `config.json`. Example:
