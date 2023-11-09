@@ -16,6 +16,7 @@ export const ConfigSchema = z.object({
       webhook: z.string().optional(),
     }),
   ),
+  sendPosts: z.boolean().optional(),
   successDelay: z.number().optional(),
   webhook: z.string().optional(),
 });

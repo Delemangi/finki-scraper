@@ -84,6 +84,13 @@ export class Scraper {
     }
   }
 
+  public async clearCache() {
+    await writeFile(this.getFullCachePath(), "", {
+      encoding: "utf8",
+      flag: "w",
+    });
+  }
+
   private async getAndSendPosts() {
     const response = await this.fetchData();
 
@@ -102,6 +109,8 @@ export class Scraper {
 
     const validPosts = await this.processNewPosts(posts, cache);
     await this.writeCacheFile(this.getFullCachePath(), ids);
+
+    logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
 
     return validPosts;
   }
@@ -175,7 +184,7 @@ export class Scraper {
       flag: "a+",
     });
 
-    return content.trim().split("\n");
+    return content.trim().split("\n").filter(Boolean);
   }
 
   private getPostsFromDOM(html: string) {
@@ -205,8 +214,12 @@ export class Scraper {
   }
 
   private async processNewPosts(posts: Element[], cache: string[]) {
-    const allPosts = [...posts].reverse().slice(0.3 * posts.length);
+    const allPosts =
+      cache.length === 0
+        ? posts.toReversed()
+        : posts.toReversed().slice(0.3 * posts.length);
     const validPosts: EmbedBuilder[] = [];
+    const sendPosts = getConfigProperty("sendPosts");
 
     for (const post of allPosts) {
       const [id, embed] = this.strategy.getPostData(post);
@@ -227,11 +240,14 @@ export class Scraper {
         continue;
       }
 
-      try {
-        await this.sendPost(embed, id);
-        validPosts.push(embed);
-      } catch {
-        await this.handleError(`${errors.postSendFailed}: ${id}`);
+      validPosts.push(embed);
+
+      if (sendPosts) {
+        try {
+          await this.sendPost(embed, id);
+        } catch {
+          await this.handleError(`${errors.postSendFailed}: ${id}`);
+        }
       }
     }
 

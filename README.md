@@ -42,6 +42,7 @@ Create a `config` folder and in it create `config.json`. Example:
   "errorDelay": 60000,
   "maxPosts": 20,
   "webhook": "<logging webhook url>",
+  "sendPosts": true,
   "scrapers": {
     "announcements": {
       "strategy": "announcements",
