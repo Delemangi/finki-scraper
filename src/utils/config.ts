@@ -1,12 +1,12 @@
-import { ConfigSchema } from "../schema/ConfigSchema.js";
-import { type Config, type ConfigKeys } from "../types/Config.js";
-import { errors } from "./constants.js";
-import { readFileSync } from "node:fs";
+import { ConfigSchema } from '../schema/ConfigSchema.js';
+import { type Config, type ConfigKeys } from '../types/Config.js';
+import { errors } from './constants.js';
+import { readFileSync } from 'node:fs';
 
 const initializeConfig = () => {
   try {
     return ConfigSchema.parse(
-      JSON.parse(readFileSync("./config/config.json", "utf8")),
+      JSON.parse(readFileSync('./config/config.json', 'utf8')),
     );
   } catch {
     throw new Error(errors.configParseFailed);

@@ -1,4 +1,4 @@
-import { type EmbedBuilder } from "discord.js";
+import { type EmbedBuilder } from 'discord.js';
 
 export type ScraperConfig = {
   cookie?: Record<string, string>;

@@ -1,25 +1,24 @@
-import { getConfigProperty } from "./utils/config.js";
-import { errors, messages } from "./utils/constants.js";
-import { logger } from "./utils/logger.js";
-import { Scraper } from "./utils/Scraper.js";
-import express from "express";
-import morgan from "morgan";
-import { argv } from "node:process";
+import { getConfigProperty } from './utils/config.js';
+import { errors, messages } from './utils/constants.js';
+import { logger } from './utils/logger.js';
+import { Scraper } from './utils/Scraper.js';
+import express from 'express';
+import morgan from 'morgan';
 
 const app = express();
-morgan(":method :url :status :res[content-length] - :response-time ms");
+morgan(':method :url :status :res[content-length] - :response-time ms');
 const port = 3_000;
 
-const names = argv.slice(2);
+const names = process.argv.slice(2);
 
 logger.info(messages.initializing);
 
 const scrapers: Record<string, Scraper> = {};
 
-app.use(morgan("combined"));
+app.use(morgan('combined'));
 
 if (names.length === 0) {
-  for (const [name, cfg] of Object.entries(getConfigProperty("scrapers"))) {
+  for (const [name, cfg] of Object.entries(getConfigProperty('scrapers'))) {
     if (cfg.enabled) {
       scrapers[name] = new Scraper(name);
     }
@@ -30,12 +29,12 @@ if (names.length === 0) {
   }
 }
 
-app.get("/", (_, response) => {
+app.get('/', (_, response) => {
   response.send(messages.appRunning);
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.get("/get/:name", async (request, response) => {
+app.get('/get/:name', async (request, response) => {
   const { name } = request.params;
 
   const scraper = scrapers[name];
@@ -62,7 +61,7 @@ app.get("/get/:name", async (request, response) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.post("/delete/:name", async (request, response) => {
+app.post('/delete/:name', async (request, response) => {
   const { name } = request.params;
 
   const scraper = scrapers[name];

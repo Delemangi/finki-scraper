@@ -16,14 +16,6 @@
       "files": "*.ts",
       "parserOptions": {
         "project": "./tsconfig.json"
-      },
-      "rules": {
-        "prettier/prettier": [
-          "error",
-          {
-            "endOfLine": "crlf"
-          }
-        ]
       }
     }
   ]

@@ -1,19 +1,19 @@
-import { AnnouncementsStrategy } from "../strategies/AnnouncementsStrategy.js";
-import { CourseStrategy } from "../strategies/CourseStrategy.js";
-import { DiplomasStrategy } from "../strategies/DiplomasStrategy.js";
-import { EventsStrategy } from "../strategies/EventsStrategy.js";
-import { JobsStrategy } from "../strategies/JobsStrategy.js";
-import { ProjectsStrategy } from "../strategies/ProjectsStrategy.js";
-import { type ScraperConfig, type ScraperStrategy } from "../types/Scraper.js";
-import { getConfigProperty } from "./config.js";
-import { cachePath, errors, messages, strategies } from "./constants.js";
-import { logger } from "./logger.js";
-import { type EmbedBuilder, roleMention, WebhookClient } from "discord.js";
-import { JSDOM } from "jsdom";
-import { existsSync } from "node:fs";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { setTimeout } from "node:timers/promises";
-import { type Logger } from "pino";
+import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
+import { CourseStrategy } from '../strategies/CourseStrategy.js';
+import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
+import { EventsStrategy } from '../strategies/EventsStrategy.js';
+import { JobsStrategy } from '../strategies/JobsStrategy.js';
+import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
+import { type ScraperConfig, type ScraperStrategy } from '../types/Scraper.js';
+import { getConfigProperty } from './config.js';
+import { cachePath, errors, messages, strategies } from './constants.js';
+import { logger } from './logger.js';
+import { type EmbedBuilder, roleMention, WebhookClient } from 'discord.js';
+import { JSDOM } from 'jsdom';
+import { existsSync } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { setTimeout } from 'node:timers/promises';
+import { type Logger } from 'pino';
 
 export class Scraper {
   private readonly strategy: ScraperStrategy;
@@ -31,7 +31,7 @@ export class Scraper {
   private readonly logger: Logger;
 
   public constructor(scraperName: string) {
-    const scraper = getConfigProperty("scrapers")[scraperName];
+    const scraper = getConfigProperty('scrapers')[scraperName];
 
     if (scraper === undefined) {
       throw new Error(`[${scraperName}] ${errors.scraperNotFound}`);
@@ -49,7 +49,7 @@ export class Scraper {
       this.webhook = new WebhookClient({ url: webhookUrl });
     }
 
-    const globalWebhookUrl = getConfigProperty("webhook");
+    const globalWebhookUrl = getConfigProperty('webhook');
 
     if (globalWebhookUrl !== undefined) {
       this.globalWebhook = new WebhookClient({ url: globalWebhookUrl });
@@ -64,12 +64,12 @@ export class Scraper {
         await this.getAndSendPosts();
       } catch (error) {
         await this.handleError(`${error}`);
-        await this.delay(getConfigProperty("errorDelay") as number);
+        await this.delay(getConfigProperty('errorDelay') as number);
 
         continue;
       }
 
-      await this.delay(getConfigProperty("successDelay") as number);
+      await this.delay(getConfigProperty('successDelay') as number);
     }
   }
 
@@ -85,9 +85,9 @@ export class Scraper {
   }
 
   public async clearCache() {
-    await writeFile(this.getFullCachePath(), "", {
-      encoding: "utf8",
-      flag: "w",
+    await writeFile(this.getFullCachePath(), '', {
+      encoding: 'utf8',
+      flag: 'w',
     });
   }
 
@@ -140,7 +140,7 @@ export class Scraper {
 
     return Object.entries(cookie)
       .map(([key, value]) => `${key}=${value}`)
-      .join("; ");
+      .join('; ');
   }
 
   private async fetchData(): Promise<Response> {
@@ -180,11 +180,11 @@ export class Scraper {
     }
 
     const content = await readFile(this.getFullCachePath(), {
-      encoding: "utf8",
-      flag: "a+",
+      encoding: 'utf8',
+      flag: 'a+',
     });
 
-    return content.trim().split("\n").filter(Boolean);
+    return content.trim().split('\n').filter(Boolean);
   }
 
   private getPostsFromDOM(html: string) {
@@ -193,7 +193,7 @@ export class Scraper {
       dom.window.document.querySelectorAll(this.strategy.postsSelector),
     );
 
-    const lastPosts = posts.slice(0, getConfigProperty("maxPosts"));
+    const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
 
     if (lastPosts.length === 0) {
       throw new Error(errors.postsNotFound);
@@ -219,14 +219,14 @@ export class Scraper {
         ? posts.toReversed()
         : posts.toReversed().slice(0.3 * posts.length);
     const validPosts: EmbedBuilder[] = [];
-    const sendPosts = getConfigProperty("sendPosts");
+    const sendPosts = getConfigProperty('sendPosts');
 
     for (const post of allPosts) {
       const [id, embed] = this.strategy.getPostData(post);
 
       if (id === null) {
         await this.handleError(
-          `${errors.postIdNotFound}: ${embed.data.title ?? "Unknown"}`,
+          `${errors.postIdNotFound}: ${embed.data.title ?? 'Unknown'}`,
         );
 
         continue;
@@ -257,8 +257,8 @@ export class Scraper {
   private async sendPost(embed: EmbedBuilder, id: string) {
     await this.webhook?.send({
       content:
-        this.scraperConfig.role === undefined || this.scraperConfig.role === ""
-          ? ""
+        this.scraperConfig.role === undefined || this.scraperConfig.role === ''
+          ? ''
           : roleMention(this.scraperConfig.role),
       embeds: [embed],
       username: this.scraperConfig.name ?? this.scraperName,
@@ -267,7 +267,7 @@ export class Scraper {
   }
 
   private async writeCacheFile(path: string, ids: Array<string | null>) {
-    await writeFile(path, ids.join("\n"), { encoding: "utf8", flag: "w" });
+    await writeFile(path, ids.join('\n'), { encoding: 'utf8', flag: 'w' });
   }
 
   private async handleError(message: string) {

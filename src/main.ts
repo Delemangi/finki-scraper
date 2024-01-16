@@ -1,17 +1,16 @@
-import { getConfigProperty } from "./utils/config.js";
-import { messages } from "./utils/constants.js";
-import { logger } from "./utils/logger.js";
-import { Scraper } from "./utils/Scraper.js";
-import { argv } from "node:process";
-import { setTimeout } from "node:timers/promises";
+import { getConfigProperty } from './utils/config.js';
+import { messages } from './utils/constants.js';
+import { logger } from './utils/logger.js';
+import { Scraper } from './utils/Scraper.js';
+import { setTimeout } from 'node:timers/promises';
 
-const names = argv.slice(2);
+const names = process.argv.slice(2);
 
 logger.info(messages.initializing);
 
 const scrapers =
   names.length === 0
-    ? Object.entries(getConfigProperty("scrapers"))
+    ? Object.entries(getConfigProperty('scrapers'))
         .filter(([, cfg]) => cfg.enabled)
         .map(([name]) => new Scraper(name))
     : names.map((name) => new Scraper(name));
