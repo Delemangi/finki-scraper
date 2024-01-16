@@ -21,12 +21,10 @@
   "name": "finki-scraper",
   "scripts": {
     "build": "rimraf dist && tsc",
+    "format": "eslint . --ext .ts --fix",
     "lint": "eslint . --ext .ts --cache",
-    "lint:fix": "eslint . --ext .ts --fix",
     "serve": "node dist/server.js",
-    "serve:dev": "npm run lint && npm run build && npm run serve",
-    "start": "node dist/main.js",
-    "start:dev": "npm run lint && npm run build && npm run start"
+    "start": "node dist/main.js"
   },
   "type": "module",
   "version": "2.0.0"
