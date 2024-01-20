@@ -1,13 +1,11 @@
-ARG PLATFORM="linux/amd64"
-
-FROM --platform=$PLATFORM node:20-alpine
+FROM --platform=${TARGETPLATFORM} node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json .
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm i
 
-COPY . .
+COPY . ./
 RUN npm run build
 
 ENTRYPOINT [ "npm", "run", "start" ]
