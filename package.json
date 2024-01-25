@@ -15,7 +15,7 @@
     "@types/morgan": "^1.9.9",
     "eslint": "^8.56.0",
     "eslint-config-canonical": "^42.8.1",
-    "husky": "^8.0.3",
+    "husky": "^9.0.2",
     "typescript": "^5.3.3"
   },
   "main": "dist/main.js",
