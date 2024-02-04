@@ -42,6 +42,7 @@ The exposed endpoints are:
 
 - `GET /list` to get all available scrapers,
 - `GET /get/<name>` to get all announcements from a certain service,
+- `DELETE /delete` to delete the cache of all services,
 - `DELETE /delete/<name>` to delete the cache of the announcements from a certain service,
 
 where `name` corresponds to the name (key) in the configuration.

@@ -67,6 +67,17 @@ app.get('/get/:name', async (request, response) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
+app.delete('/delete', async (_, response) => {
+  for (const scraper of Object.values(scrapers)) {
+    await scraper.clearCache();
+  }
+
+  response.send({
+    message: messages.cacheCleared,
+  });
+});
+
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.delete('/delete/:name', async (request, response) => {
   const { name } = request.params;
 
