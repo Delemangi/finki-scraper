@@ -2,10 +2,13 @@ import { getConfigProperty } from './utils/config.js';
 import { errors, messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { Scraper } from './utils/Scraper.js';
+import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 
 const app = express();
+app.use(cors());
+
 morgan(':method :url :status :res[content-length] - :response-time ms');
 const port = 3_000;
 
