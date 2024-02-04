@@ -61,7 +61,7 @@ app.get('/get/:name', async (request, response) => {
 });
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-app.post('/delete/:name', async (request, response) => {
+app.delete('/delete/:name', async (request, response) => {
   const { name } = request.params;
 
   const scraper = scrapers[name];

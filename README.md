@@ -38,6 +38,8 @@ or
 
 You can also run this app in server mode using `npm run serve`, which will boot up an Express based server which will open endpoints for receiving new announcements. The app will only scrape new announcements whenever it receives a request, instead of periodically scraping.
 
+The exposed endpoints are `GET /get/<name>` and `DELETE /delete/<name>`, where `name` corresponds to the name (key) in the configuration.
+
 ## Config
 
 Create a `config` folder and in it create `config.json`. Example:
