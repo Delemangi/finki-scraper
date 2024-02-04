@@ -33,6 +33,12 @@ app.get('/', (_, response) => {
   response.send(messages.appRunning);
 });
 
+app.get('/list', (_, response) => {
+  response.send({
+    scrapers: Object.keys(scrapers),
+  });
+});
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 app.get('/get/:name', async (request, response) => {
   const { name } = request.params;
