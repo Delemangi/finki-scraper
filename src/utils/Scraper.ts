@@ -61,7 +61,7 @@ export class Scraper {
       this.logger.info(`[${this.scraperName}] ${messages.searching}`);
 
       try {
-        await this.getAndSendPosts();
+        await this.getAndSendPosts(true);
       } catch (error) {
         await this.handleError(`${error}`);
         await this.delay(getConfigProperty('errorDelay') as number);
@@ -77,7 +77,7 @@ export class Scraper {
     this.logger.info(`[${this.scraperName}] ${messages.searching}`);
 
     try {
-      return await this.getAndSendPosts();
+      return await this.getAndSendPosts(false);
     } catch (error) {
       await this.handleError(`${error}`);
       return null;
@@ -91,7 +91,7 @@ export class Scraper {
     });
   }
 
-  private async getAndSendPosts() {
+  private async getAndSendPosts(checkCache: boolean) {
     const response = await this.fetchData();
 
     this.checkStatusCode(response.status);
@@ -101,13 +101,13 @@ export class Scraper {
     const posts = this.getPostsFromDOM(text);
     const ids = this.getIdsFromPosts(posts);
 
-    if (this.hasNoNewPosts(ids, cache)) {
+    if (checkCache && this.hasNoNewPosts(ids, cache)) {
       this.logger.info(`[${this.scraperName}] ${messages.noNewPosts}`);
 
       return [];
     }
 
-    const validPosts = await this.processNewPosts(posts, cache);
+    const validPosts = await this.processNewPosts(posts, cache, checkCache);
     await this.writeCacheFile(this.getFullCachePath(), ids);
 
     logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
@@ -213,7 +213,11 @@ export class Scraper {
     );
   }
 
-  private async processNewPosts(posts: Element[], cache: string[]) {
+  private async processNewPosts(
+    posts: Element[],
+    cache: string[],
+    checkCache: boolean,
+  ) {
     const allPosts =
       cache.length === 0
         ? posts.toReversed()
@@ -232,7 +236,7 @@ export class Scraper {
         continue;
       }
 
-      if (cache.includes(id)) {
+      if (checkCache && cache.includes(id)) {
         this.logger.info(
           `[${this.scraperName}] ${messages.postAlreadySent}: ${id}`,
         );
