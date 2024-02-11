@@ -5,6 +5,7 @@ import { Scraper } from './utils/Scraper.js';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
+import { readFileSync } from 'node:fs';
 
 const app = express();
 app.use(cors());
@@ -98,6 +99,18 @@ app.delete('/delete/:name', async (request, response) => {
   response.send({
     message: messages.cacheCleared,
   });
+});
+
+app.get('/questions', (_, response) => {
+  const questions = readFileSync('./config/questions.json', 'utf8');
+
+  try {
+    response.send(JSON.parse(questions));
+  } catch {
+    response.status(500).send({
+      error: errors.configParseFailed,
+    });
+  }
 });
 
 app.listen(port, () => {
