@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  scraper:
+    container_name: finki-scraper
+    image: finki-scraper
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./cache:/app/cache
+      - ./config:/app/config
+      - ./bot.log:/app/bot.log
+    entrypoint: ["npm", "run", "serve"]
+    ports:
+      - 3000:3000
