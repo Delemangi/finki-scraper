@@ -6,6 +6,7 @@ dist
 *.js
 
 # Logs
+logs
 *.log
 
 # User defined folders
