@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   scraper:
@@ -8,4 +8,4 @@ services:
     volumes:
       - ./cache:/app/cache
       - ./config:/app/config
-      - ./bot.log:/app/bot.log
+      - ./logs:/app/logs

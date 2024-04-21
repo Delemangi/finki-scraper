@@ -14,7 +14,7 @@ const transport = pino.transport({
     {
       level: 'info',
       options: {
-        destination: join('.', 'bot.log'),
+        destination: join('.', 'logs', 'bot.log'),
       },
       target: 'pino/file',
     },
