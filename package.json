@@ -10,7 +10,7 @@
     "jsdom": "^24.0.0",
     "morgan": "^1.10.0",
     "pino": "^9.1.0",
-    "pino-pretty": "^11.0.0",
+    "pino-pretty": "^11.1.0",
     "zod": "^3.23.8"
   },
   "description": "FINKI Scraper",
