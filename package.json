@@ -21,7 +21,7 @@
     "@types/morgan": "^1.9.9",
     "eslint": "^8.57.0",
     "eslint-config-canonical": "42.8.2",
-    "husky": "^9.1.4",
+    "husky": "^9.1.5",
     "rimraf": "^5.0.8",
     "typescript": "^5.4.5"
   },
