@@ -25,5 +25,9 @@
     "resolveJsonModule": true,
     "strict": true,
     "target": "ESNext"
-  }
+  },
+  "exclude": [
+    "eslint.config.js",
+    "dist"
+  ]
 }

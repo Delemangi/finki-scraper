@@ -16,19 +16,19 @@ import { setTimeout } from 'node:timers/promises';
 import { type Logger } from 'pino';
 
 export class Scraper {
-  private readonly strategy: ScraperStrategy;
+  private readonly cookie: string;
+
+  private readonly globalWebhook?: WebhookClient;
+
+  private readonly logger: Logger;
 
   private readonly scraperConfig: ScraperConfig;
 
   private readonly scraperName: string;
 
-  private readonly cookie: string;
+  private readonly strategy: ScraperStrategy;
 
   private readonly webhook?: WebhookClient;
-
-  private readonly globalWebhook?: WebhookClient;
-
-  private readonly logger: Logger;
 
   public constructor(scraperName: string) {
     const scraper = getConfigProperty('scrapers')[scraperName];
@@ -56,39 +56,25 @@ export class Scraper {
     }
   }
 
-  public async run() {
-    while (true) {
-      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
-
-      try {
-        await this.getAndSendPosts(true);
-      } catch (error) {
-        await this.handleError(`${error}`);
-        await this.delay(getConfigProperty('errorDelay') as number);
-
-        continue;
-      }
-
-      await this.delay(getConfigProperty('successDelay') as number);
+  private checkStatusCode(statusCode: number) {
+    if (statusCode !== 200) {
+      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
     }
   }
 
-  public async runOnce() {
-    this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+  private async delay(milliseconds: number) {
+    await setTimeout(milliseconds);
+  }
 
+  private async fetchData(): Promise<Response> {
     try {
-      return await this.getAndSendPosts(false);
-    } catch (error) {
-      await this.handleError(`${error}`);
-      return null;
+      return await fetch(
+        this.scraperConfig.link,
+        this.strategy.getRequestInit(this.cookie),
+      );
+    } catch {
+      throw new Error(errors.fetchFailed);
     }
-  }
-
-  public async clearCache() {
-    await writeFile(this.getFullCachePath(), '', {
-      encoding: 'utf8',
-      flag: 'w',
-    });
   }
 
   private async getAndSendPosts(checkCache: boolean) {
@@ -115,6 +101,38 @@ export class Scraper {
     return validPosts;
   }
 
+  private getCookie(): string {
+    const cookie =
+      this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {};
+
+    return Object.entries(cookie)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('; ');
+  }
+
+  private getFullCachePath(): string {
+    return `./${cachePath}/${this.scraperName}`;
+  }
+
+  private getIdsFromPosts(posts: Element[]) {
+    return posts.map((post) => this.strategy.getId(post));
+  }
+
+  private getPostsFromDOM(html: string) {
+    const dom = new JSDOM(html);
+    const posts = Array.from(
+      dom.window.document.querySelectorAll(this.strategy.postsSelector),
+    );
+
+    const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
+
+    if (lastPosts.length === 0) {
+      throw new Error(errors.postsNotFound);
+    }
+
+    return lastPosts;
+  }
+
   private getStrategy(): ScraperStrategy {
     switch (this.scraperConfig.strategy) {
       case strategies.announcements:
@@ -134,32 +152,6 @@ export class Scraper {
     }
   }
 
-  private getCookie(): string {
-    const cookie =
-      this.scraperConfig.cookie ?? this.strategy.defaultCookie ?? {};
-
-    return Object.entries(cookie)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('; ');
-  }
-
-  private async fetchData(): Promise<Response> {
-    try {
-      return await fetch(
-        this.scraperConfig.link,
-        this.strategy.getRequestInit(this.cookie),
-      );
-    } catch {
-      throw new Error(errors.fetchFailed);
-    }
-  }
-
-  private checkStatusCode(statusCode: number) {
-    if (statusCode !== 200) {
-      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
-    }
-  }
-
   private async getTextFromResponse(response: Response) {
     try {
       return await response.text();
@@ -168,45 +160,15 @@ export class Scraper {
     }
   }
 
-  private getFullCachePath(): string {
-    return `./${cachePath}/${this.scraperName}`;
-  }
-
-  private async readCacheFile() {
-    if (!existsSync(cachePath)) {
-      await mkdir(cachePath, {
-        recursive: true,
-      });
-    }
-
-    const content = await readFile(this.getFullCachePath(), {
-      encoding: 'utf8',
-      flag: 'a+',
+  private async handleError(message: string) {
+    this.logger.error(`[${this.scraperName}] ${message}`);
+    await this.globalWebhook?.send({
+      content: message,
+      username: this.scraperConfig.name ?? this.scraperName,
     });
-
-    return content.trim().split('\n').filter(Boolean);
   }
 
-  private getPostsFromDOM(html: string) {
-    const dom = new JSDOM(html);
-    const posts = Array.from(
-      dom.window.document.querySelectorAll(this.strategy.postsSelector),
-    );
-
-    const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
-
-    if (lastPosts.length === 0) {
-      throw new Error(errors.postsNotFound);
-    }
-
-    return lastPosts;
-  }
-
-  private getIdsFromPosts(posts: Element[]) {
-    return posts.map((post) => this.strategy.getId(post));
-  }
-
-  private hasNoNewPosts(ids: Array<string | null>, cache: string[]) {
+  private hasNoNewPosts(ids: Array<null | string>, cache: string[]) {
     return (
       ids.length === cache.length &&
       ids.every((value) => value === null || cache.includes(value))
@@ -258,6 +220,21 @@ export class Scraper {
     return validPosts.map((embed) => embed.data);
   }
 
+  private async readCacheFile() {
+    if (!existsSync(cachePath)) {
+      await mkdir(cachePath, {
+        recursive: true,
+      });
+    }
+
+    const content = await readFile(this.getFullCachePath(), {
+      encoding: 'utf8',
+      flag: 'a+',
+    });
+
+    return content.trim().split('\n').filter(Boolean);
+  }
+
   private async sendPost(embed: EmbedBuilder, id: string) {
     await this.webhook?.send({
       content:
@@ -270,19 +247,42 @@ export class Scraper {
     this.logger.info(`[${this.scraperName}] ${messages.postSent}: ${id}`);
   }
 
-  private async writeCacheFile(path: string, ids: Array<string | null>) {
+  private async writeCacheFile(path: string, ids: Array<null | string>) {
     await writeFile(path, ids.join('\n'), { encoding: 'utf8', flag: 'w' });
   }
 
-  private async handleError(message: string) {
-    this.logger.error(`[${this.scraperName}] ${message}`);
-    await this.globalWebhook?.send({
-      content: message,
-      username: this.scraperConfig.name ?? this.scraperName,
+  public async clearCache() {
+    await writeFile(this.getFullCachePath(), '', {
+      encoding: 'utf8',
+      flag: 'w',
     });
   }
 
-  private async delay(milliseconds: number) {
-    await setTimeout(milliseconds);
+  public async run() {
+    while (true) {
+      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+      try {
+        await this.getAndSendPosts(true);
+      } catch (error) {
+        await this.handleError(`${error}`);
+        await this.delay(getConfigProperty('errorDelay') as number);
+
+        continue;
+      }
+
+      await this.delay(getConfigProperty('successDelay') as number);
+    }
+  }
+
+  public async runOnce() {
+    this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+    try {
+      return await this.getAndSendPosts(false);
+    } catch (error) {
+      await this.handleError(`${error}`);
+      return null;
+    }
   }
 }

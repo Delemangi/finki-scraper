@@ -1,0 +1,7 @@
+{
+  "eslint.useFlatConfig": true,
+  "sonarlint.connectedMode.project": {
+    "connectionId": "delemangi",
+    "projectKey": "finki-scraper"
+  }
+}

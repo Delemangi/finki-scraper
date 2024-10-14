@@ -12,8 +12,8 @@ export type ScraperConfig = {
 
 export type ScraperStrategy = {
   defaultCookie?: Record<string, string>;
-  getId: (element: Element) => string | null;
-  getPostData: (element: Element) => [string | null, EmbedBuilder];
+  getId: (element: Element) => null | string;
+  getPostData: (element: Element) => [null | string, EmbedBuilder];
   getRequestInit: (cookie: string) => RequestInit | undefined;
   idsSelector: string;
   postsSelector: string;

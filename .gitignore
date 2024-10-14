@@ -197,8 +197,6 @@ cache
 
 # IDEs
 .idea
-.vscode
 
 # Compiled output
 dist
-*.js

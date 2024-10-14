@@ -1,10 +1,9 @@
 name: finki-scraper-dev
-
 services:
   scraper:
+    build: .
     container_name: finki-scraper-dev
     image: finki-scraper-dev:latest
-    build: .
     restart: unless-stopped
     volumes:
       - ./cache:/app/cache

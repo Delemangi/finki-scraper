@@ -1,14 +1,16 @@
 name: finki-scraper-server
-
 services:
   scraper:
     container_name: finki-scraper-server
+    entrypoint: 
+      - 'npm'
+      - 'run'
+      - 'serve'
     image: delemangi/finki-scraper:latest
+    ports:
+      - 3000:3000
     restart: unless-stopped
     volumes:
       - ./cache:/app/cache
       - ./config:/app/config
       - ./logs:/app/logs
-    entrypoint: ["npm", "run", "serve"]
-    ports:
-      - 3000:3000

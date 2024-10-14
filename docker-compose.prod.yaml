@@ -1,5 +1,4 @@
 name: finki-scraper
-
 services:
   scraper:
     container_name: finki-scraper

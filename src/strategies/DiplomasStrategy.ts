@@ -3,13 +3,17 @@ import { getConfigProperty } from '../utils/config.js';
 import { EmbedBuilder } from 'discord.js';
 
 export class DiplomasStrategy implements ScraperStrategy {
-  public postsSelector = 'div.panel';
+  public defaultCookie = getConfigProperty('diplomasCookie');
 
   public idsSelector = 'div.panel-heading';
 
-  public defaultCookie = getConfigProperty('diplomasCookie');
+  public postsSelector = 'div.panel';
 
-  public getPostData(element: Element): [string | null, EmbedBuilder] {
+  public getId(element: Element): null | string {
+    return element.querySelector(this.idsSelector)?.textContent?.trim() ?? null;
+  }
+
+  public getPostData(element: Element): [null | string, EmbedBuilder] {
     const title =
       element.querySelector('div.panel-heading')?.textContent?.trim() ?? '?';
     const [index, student] = element
@@ -111,9 +115,5 @@ export class DiplomasStrategy implements ScraperStrategy {
       credentials: 'same-origin',
       headers: { Cookie: cookie },
     };
-  }
-
-  public getId(element: Element): string | null {
-    return element.querySelector(this.idsSelector)?.textContent?.trim() ?? null;
   }
 }
