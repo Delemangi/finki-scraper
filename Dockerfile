@@ -1,15 +1,13 @@
-# Build stage
-FROM --platform=${TARGETPLATFORM} node:20-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm i --ignore-scripts && npm cache clean --force
+RUN npm i --ignore-scripts
 
 COPY . ./
 RUN npm run build
 
-# Production stage
-FROM --platform=${TARGETPLATFORM} node:20-alpine AS production
+FROM node:20-alpine AS final
 WORKDIR /app
 
 COPY package.json package-lock.json ./

@@ -56,6 +56,41 @@ export class Scraper {
     }
   }
 
+  public async clearCache() {
+    await writeFile(this.getFullCachePath(), '', {
+      encoding: 'utf8',
+      flag: 'w',
+    });
+  }
+
+  public async run() {
+    while (true) {
+      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+      try {
+        await this.getAndSendPosts(true);
+      } catch (error) {
+        await this.handleError(`${error}`);
+        await this.delay(getConfigProperty('errorDelay') as number);
+
+        continue;
+      }
+
+      await this.delay(getConfigProperty('successDelay') as number);
+    }
+  }
+
+  public async runOnce() {
+    this.logger.info(`[${this.scraperName}] ${messages.searching}`);
+
+    try {
+      return await this.getAndSendPosts(false);
+    } catch (error) {
+      await this.handleError(`${error}`);
+      return null;
+    }
+  }
+
   private checkStatusCode(statusCode: number) {
     if (statusCode !== 200) {
       throw new Error(`${errors.badResponseCode}: ${statusCode}`);
@@ -96,7 +131,11 @@ export class Scraper {
     const validPosts = await this.processNewPosts(posts, cache, checkCache);
     await this.writeCacheFile(this.getFullCachePath(), ids);
 
-    logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
+    const sendPosts = getConfigProperty('sendPosts');
+
+    if (sendPosts) {
+      logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
+    }
 
     return validPosts;
   }
@@ -139,14 +178,14 @@ export class Scraper {
         return new AnnouncementsStrategy();
       case strategies.course:
         return new CourseStrategy();
+      case strategies.diplomas:
+        return new DiplomasStrategy();
       case strategies.events:
         return new EventsStrategy();
       case strategies.jobs:
         return new JobsStrategy();
       case strategies.projects:
         return new ProjectsStrategy();
-      case strategies.diplomas:
-        return new DiplomasStrategy();
       default:
         throw new Error(errors.strategyNotFound);
     }
@@ -249,40 +288,5 @@ export class Scraper {
 
   private async writeCacheFile(path: string, ids: Array<null | string>) {
     await writeFile(path, ids.join('\n'), { encoding: 'utf8', flag: 'w' });
-  }
-
-  public async clearCache() {
-    await writeFile(this.getFullCachePath(), '', {
-      encoding: 'utf8',
-      flag: 'w',
-    });
-  }
-
-  public async run() {
-    while (true) {
-      this.logger.info(`[${this.scraperName}] ${messages.searching}`);
-
-      try {
-        await this.getAndSendPosts(true);
-      } catch (error) {
-        await this.handleError(`${error}`);
-        await this.delay(getConfigProperty('errorDelay') as number);
-
-        continue;
-      }
-
-      await this.delay(getConfigProperty('successDelay') as number);
-    }
-  }
-
-  public async runOnce() {
-    this.logger.info(`[${this.scraperName}] ${messages.searching}`);
-
-    try {
-      return await this.getAndSendPosts(false);
-    } catch (error) {
-      await this.handleError(`${error}`);
-      return null;
-    }
   }
 }
