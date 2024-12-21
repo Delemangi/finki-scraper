@@ -131,7 +131,11 @@ export class Scraper {
     const validPosts = await this.processNewPosts(posts, cache, checkCache);
     await this.writeCacheFile(this.getFullCachePath(), ids);
 
-    logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
+    const sendPosts = getConfigProperty('sendPosts');
+
+    if (sendPosts) {
+      logger.info(`[${this.scraperName}] ${messages.sentNewPosts}`);
+    }
 
     return validPosts;
   }
