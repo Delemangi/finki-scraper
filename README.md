@@ -4,6 +4,8 @@ Various scripts for scraping several FINKI (FCSE) services for the purpose of fo
 
 It's recommended, but not required to run this inside a Docker container.
 
+Requires Node 20 or higher.
+
 ## Installation
 
 For development purposes, be sure to run `npm run prepare` to install the Git pre-commit hooks.
