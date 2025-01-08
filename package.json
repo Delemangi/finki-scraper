@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "discord.js": "^14.17.2",
+    "discord.js": "^14.17.3",
     "express": "^5.0.1",
     "jsdom": "^25.0.1",
     "morgan": "^1.10.0",
