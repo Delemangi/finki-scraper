@@ -23,7 +23,7 @@
     "eslint-config-canonical": "^44.3.43",
     "husky": "^9.1.7",
     "rimraf": "^6.0.1",
-    "typescript": "~5.7.3"
+    "typescript": "~5.8.2"
   },
   "engines": {
     "node": ">=20.0.0"
