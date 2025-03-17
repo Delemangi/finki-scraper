@@ -20,7 +20,7 @@
     "@types/jsdom": "^21.1.7",
     "@types/morgan": "^1.9.9",
     "eslint": "^9.22.0",
-    "eslint-config-canonical": "^44.3.43",
+    "eslint-config-canonical": "^44.4.2",
     "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "typescript": "~5.8.2"
