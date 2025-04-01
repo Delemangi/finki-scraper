@@ -19,8 +19,6 @@ import { logger } from './logger.js';
 export class Scraper {
   private readonly cookie: string;
 
-  private readonly globalWebhook?: WebhookClient;
-
   private readonly logger: Logger;
 
   private readonly scraperConfig: ScraperConfig;
@@ -44,16 +42,11 @@ export class Scraper {
     this.cookie = this.getCookie();
     this.logger = logger;
 
-    const webhookUrl = this.scraperConfig.webhook;
+    const webhookUrl =
+      this.scraperConfig.webhook ?? getConfigProperty('webhook');
 
-    if (webhookUrl !== undefined) {
+    if (webhookUrl !== '') {
       this.webhook = new WebhookClient({ url: webhookUrl });
-    }
-
-    const globalWebhookUrl = getConfigProperty('webhook');
-
-    if (globalWebhookUrl !== '') {
-      this.globalWebhook = new WebhookClient({ url: globalWebhookUrl });
     }
   }
 
@@ -202,7 +195,7 @@ export class Scraper {
 
   private async handleError(message: string) {
     this.logger.error(`[${this.scraperName}] ${message}`);
-    await this.globalWebhook?.send({
+    await this.webhook?.send({
       content: message,
       username: this.scraperConfig.name ?? this.scraperName,
     });
