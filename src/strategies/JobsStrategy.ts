@@ -40,7 +40,7 @@ export class JobsStrategy implements ScraperStrategy {
 
     return {
       embed,
-      id: link,
+      id: this.getId(element),
     };
   }
 

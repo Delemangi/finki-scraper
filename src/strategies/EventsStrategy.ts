@@ -40,7 +40,7 @@ export class EventsStrategy implements ScraperStrategy {
 
     return {
       embed,
-      id: link,
+      id: this.getId(element),
     };
   }
 

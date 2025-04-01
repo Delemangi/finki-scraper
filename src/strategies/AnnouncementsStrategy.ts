@@ -9,7 +9,6 @@ export class AnnouncementsStrategy implements ScraperStrategy {
 
   public postsSelector = 'div.views-row';
 
-  // id for caching
   public getId(element: Element): null | string {
     const url = element
       .querySelector(this.idsSelector)
@@ -31,7 +30,7 @@ export class AnnouncementsStrategy implements ScraperStrategy {
 
     return {
       embed,
-      id: link,
+      id: this.getId(element),
     };
   }
 

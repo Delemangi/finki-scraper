@@ -40,7 +40,7 @@ export class ProjectsStrategy implements ScraperStrategy {
 
     return {
       embed,
-      id: link,
+      id: this.getId(element),
     };
   }
 
