@@ -2,7 +2,7 @@ name: finki-scraper-server
 services:
   scraper:
     container_name: finki-scraper-server
-    entrypoint: 
+    entrypoint:
       - 'npm'
       - 'run'
       - 'serve'
