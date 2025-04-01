@@ -28,6 +28,7 @@ export const strategies = {
   events: 'events',
   jobs: 'jobs',
   projects: 'projects',
+  timetables: 'timetables',
 };
 
 export const cachePath = 'cache';

@@ -12,6 +12,7 @@ import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
 import { EventsStrategy } from '../strategies/EventsStrategy.js';
 import { JobsStrategy } from '../strategies/JobsStrategy.js';
 import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
+import { TimetablesStrategy } from '../strategies/TimetablesStrategy.js';
 import { getConfigProperty } from './config.js';
 import { cachePath, errors, messages, strategies } from './constants.js';
 import { logger } from './logger.js';
@@ -180,6 +181,8 @@ export class Scraper {
         return new JobsStrategy();
       case strategies.projects:
         return new ProjectsStrategy();
+      case strategies.timetables:
+        return new TimetablesStrategy();
       default:
         throw new Error(errors.strategyNotFound);
     }
