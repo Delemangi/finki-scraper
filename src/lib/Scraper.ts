@@ -1,14 +1,18 @@
+import { z } from 'zod';
+
 import type { PostData } from './Post.js';
 
-export type ScraperConfig = {
-  cookie?: Record<string, string>;
-  enabled: boolean;
-  link: string;
-  name?: string;
-  role?: string;
-  strategy: string;
-  webhook?: string;
-};
+export const ScraperConfigSchema = z.object({
+  cookie: z.record(z.string()).optional(),
+  enabled: z.boolean().optional(),
+  link: z.string(),
+  name: z.string().optional(),
+  role: z.string().optional(),
+  strategy: z.string(),
+  webhook: z.string().optional(),
+});
+
+export type ScraperConfig = z.infer<typeof ScraperConfigSchema>;
 
 export type ScraperStrategy = {
   defaultCookie?: Record<string, string>;

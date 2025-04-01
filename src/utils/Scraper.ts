@@ -39,7 +39,7 @@ export class Scraper {
     }
 
     this.scraperName = scraperName;
-    this.scraperConfig = scraper as ScraperConfig;
+    this.scraperConfig = scraper;
     this.strategy = this.getStrategy();
     this.cookie = this.getCookie();
     this.logger = logger;
