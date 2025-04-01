@@ -4,7 +4,7 @@ import {
   type ConfigKeys,
   ConfigSchema,
   type FullyRequiredConfig,
-} from '../lib/ConfigSchema.js';
+} from '../lib/Config.js';
 import { errors } from './constants.js';
 
 const initializeConfig = () => {
