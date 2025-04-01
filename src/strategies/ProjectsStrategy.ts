@@ -1,5 +1,6 @@
-import { type ScraperStrategy } from '../types/Scraper.js';
 import { EmbedBuilder } from 'discord.js';
+
+import { type ScraperStrategy } from '../lib/Scraper.js';
 
 export class ProjectsStrategy implements ScraperStrategy {
   public idsSelector = 'a + a';

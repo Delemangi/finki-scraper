@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 import { pino } from 'pino';
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const transport = pino.transport({
   targets: [
     {
@@ -21,4 +22,5 @@ const transport = pino.transport({
   ],
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export const logger = pino(transport);

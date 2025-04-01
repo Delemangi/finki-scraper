@@ -1,19 +1,20 @@
-import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
-import { CourseStrategy } from '../strategies/CourseStrategy.js';
-import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
-import { EventsStrategy } from '../strategies/EventsStrategy.js';
-import { JobsStrategy } from '../strategies/JobsStrategy.js';
-import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
-import { type ScraperConfig, type ScraperStrategy } from '../types/Scraper.js';
-import { getConfigProperty } from './config.js';
-import { cachePath, errors, messages, strategies } from './constants.js';
-import { logger } from './logger.js';
 import { type EmbedBuilder, roleMention, WebhookClient } from 'discord.js';
 import { JSDOM } from 'jsdom';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
 import { type Logger } from 'pino';
+
+import { type ScraperConfig, type ScraperStrategy } from '../lib/Scraper.js';
+import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
+import { CourseStrategy } from '../strategies/CourseStrategy.js';
+import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
+import { EventsStrategy } from '../strategies/EventsStrategy.js';
+import { JobsStrategy } from '../strategies/JobsStrategy.js';
+import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
+import { getConfigProperty } from './config.js';
+import { cachePath, errors, messages, strategies } from './constants.js';
+import { logger } from './logger.js';
 
 export class Scraper {
   private readonly cookie: string;
@@ -51,7 +52,7 @@ export class Scraper {
 
     const globalWebhookUrl = getConfigProperty('webhook');
 
-    if (globalWebhookUrl !== undefined) {
+    if (globalWebhookUrl !== '') {
       this.globalWebhook = new WebhookClient({ url: globalWebhookUrl });
     }
   }
@@ -71,12 +72,12 @@ export class Scraper {
         await this.getAndSendPosts(true);
       } catch (error) {
         await this.handleError(`${error}`);
-        await this.delay(getConfigProperty('errorDelay') as number);
+        await this.delay(getConfigProperty('errorDelay'));
 
         continue;
       }
 
-      await this.delay(getConfigProperty('successDelay') as number);
+      await this.delay(getConfigProperty('successDelay'));
     }
   }
 

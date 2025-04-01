@@ -15,6 +15,7 @@ export default [
   perfectionist,
   {
     rules: {
+      '@typescript-eslint/restrict-template-expressions': ['off'],
       'class-methods-use-this': ['off'],
     },
   },

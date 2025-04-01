@@ -1,8 +1,9 @@
+import { setTimeout } from 'node:timers/promises';
+
 import { getConfigProperty } from './utils/config.js';
 import { messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { Scraper } from './utils/Scraper.js';
-import { setTimeout } from 'node:timers/promises';
 
 const names = process.argv.slice(2);
 

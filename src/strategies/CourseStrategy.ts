@@ -1,6 +1,7 @@
-import { type ScraperStrategy } from '../types/Scraper.js';
-import { getConfigProperty } from '../utils/config.js';
 import { EmbedBuilder } from 'discord.js';
+
+import { type ScraperStrategy } from '../lib/Scraper.js';
+import { getConfigProperty } from '../utils/config.js';
 
 export class CourseStrategy implements ScraperStrategy {
   public defaultCookie = getConfigProperty('coursesCookie');

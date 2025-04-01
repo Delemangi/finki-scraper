@@ -1,10 +1,11 @@
+import cors from 'cors';
+import express from 'express';
+import morgan from 'morgan';
+
 import { getConfigProperty } from './utils/config.js';
 import { errors, messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { Scraper } from './utils/Scraper.js';
-import cors from 'cors';
-import express from 'express';
-import morgan from 'morgan';
 
 const app = express();
 app.use(cors());
