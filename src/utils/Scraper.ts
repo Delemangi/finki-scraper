@@ -6,6 +6,7 @@ import { setTimeout } from 'node:timers/promises';
 import { type Logger } from 'pino';
 
 import { type ScraperConfig, type ScraperStrategy } from '../lib/Scraper.js';
+import { Strategy, StrategySchema } from '../lib/Strategy.js';
 import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
 import { CourseStrategy } from '../strategies/CourseStrategy.js';
 import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
@@ -14,7 +15,7 @@ import { JobsStrategy } from '../strategies/JobsStrategy.js';
 import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
 import { TimetablesStrategy } from '../strategies/TimetablesStrategy.js';
 import { getConfigProperty } from './config.js';
-import { cachePath, errors, messages, strategies } from './constants.js';
+import { cachePath, errors, messages } from './constants.js';
 import { logger } from './logger.js';
 
 export class Scraper {
@@ -168,20 +169,28 @@ export class Scraper {
   }
 
   private getStrategy(): ScraperStrategy {
-    switch (this.scraperConfig.strategy) {
-      case strategies.announcements:
+    const { data: scraperStrategy, success } = StrategySchema.safeParse(
+      this.scraperConfig.strategy,
+    );
+
+    if (!success) {
+      throw new Error(`${errors.strategyNotFound}: ${errors.strategyNotFound}`);
+    }
+
+    switch (scraperStrategy) {
+      case Strategy.Announcements:
         return new AnnouncementsStrategy();
-      case strategies.course:
+      case Strategy.Course:
         return new CourseStrategy();
-      case strategies.diplomas:
+      case Strategy.Diplomas:
         return new DiplomasStrategy();
-      case strategies.events:
+      case Strategy.Events:
         return new EventsStrategy();
-      case strategies.jobs:
+      case Strategy.Jobs:
         return new JobsStrategy();
-      case strategies.projects:
+      case Strategy.Projects:
         return new ProjectsStrategy();
-      case strategies.timetables:
+      case Strategy.Timetables:
         return new TimetablesStrategy();
       default:
         throw new Error(errors.strategyNotFound);

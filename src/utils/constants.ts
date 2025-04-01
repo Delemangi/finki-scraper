@@ -21,14 +21,4 @@ export const errors = {
   strategyNotFound: 'Strategy not found',
 };
 
-export const strategies = {
-  announcements: 'announcements',
-  course: 'course',
-  diplomas: 'diplomas',
-  events: 'events',
-  jobs: 'jobs',
-  projects: 'projects',
-  timetables: 'timetables',
-};
-
 export const cachePath = 'cache';
