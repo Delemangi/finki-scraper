@@ -3,6 +3,7 @@ import { EmbedBuilder } from 'discord.js';
 import type { PostData } from '../lib/Post.js';
 
 import { type ScraperStrategy } from '../lib/Scraper.js';
+import { getThemeColor } from '../utils/config.js';
 
 export class EventsStrategy implements ScraperStrategy {
   public idsSelector = 'a + a';
@@ -35,7 +36,7 @@ export class EventsStrategy implements ScraperStrategy {
       .setURL(link)
       .setThumbnail(image)
       .setDescription(content === '' ? 'Нема опис.' : content)
-      .setColor('#313183')
+      .setColor(getThemeColor())
       .setTimestamp();
 
     return {

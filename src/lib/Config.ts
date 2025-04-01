@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const RequiredConfigSchema = z.object({
+  color: z.string().optional(),
   coursesCookie: z.record(z.string()).optional(),
   diplomasCookie: z.record(z.string()).optional(),
   errorDelay: z.number().optional(),

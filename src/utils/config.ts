@@ -1,3 +1,5 @@
+import type { ColorResolvable } from 'discord.js';
+
 import { readFileSync } from 'node:fs';
 
 import {
@@ -21,6 +23,7 @@ const initializeConfig = () => {
 const config = initializeConfig();
 
 const DEFAULT_CONFIGURATION: FullyRequiredConfig = {
+  color: '#313183',
   coursesCookie: {},
   diplomasCookie: {},
   errorDelay: 60_000,
@@ -33,3 +36,6 @@ const DEFAULT_CONFIGURATION: FullyRequiredConfig = {
 
 export const getConfigProperty = <T extends ConfigKeys>(property: T) =>
   config?.[property] ?? DEFAULT_CONFIGURATION[property];
+
+export const getThemeColor = () =>
+  getConfigProperty('color') as ColorResolvable;

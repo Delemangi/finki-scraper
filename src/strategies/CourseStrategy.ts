@@ -3,7 +3,7 @@ import { EmbedBuilder } from 'discord.js';
 import type { PostData } from '../lib/Post.js';
 
 import { type ScraperStrategy } from '../lib/Scraper.js';
-import { getConfigProperty } from '../utils/config.js';
+import { getConfigProperty, getThemeColor } from '../utils/config.js';
 
 export class CourseStrategy implements ScraperStrategy {
   public defaultCookie = getConfigProperty('coursesCookie');
@@ -56,7 +56,7 @@ export class CourseStrategy implements ScraperStrategy {
       })
       .setURL(link)
       .setDescription(content === '' ? 'Нема опис.' : content)
-      .setColor('#313183')
+      .setColor(getThemeColor())
       .setTimestamp();
 
     return {
