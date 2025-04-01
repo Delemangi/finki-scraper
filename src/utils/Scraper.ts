@@ -221,7 +221,7 @@ export class Scraper {
     const sendPosts = getConfigProperty('sendPosts');
 
     for (const post of allPosts) {
-      const [id, embed] = this.strategy.getPostData(post);
+      const { embed, id } = this.strategy.getPostData(post);
 
       if (id === null) {
         await this.handleError(

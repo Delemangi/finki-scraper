@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 
+import type { PostData } from '../lib/Post.js';
+
 import { type ScraperStrategy } from '../lib/Scraper.js';
 
 export class EventsStrategy implements ScraperStrategy {
@@ -15,7 +17,7 @@ export class EventsStrategy implements ScraperStrategy {
     return url === undefined ? null : `https://finki.ukim.mk${url}`;
   }
 
-  public getPostData(element: Element): [null | string, EmbedBuilder] {
+  public getPostData(element: Element): PostData {
     const url = element.querySelector('a + a')?.getAttribute('href')?.trim();
     const link = url === undefined ? null : `https://finki.ukim.mk${url}`;
     const title = element.querySelector('a + a')?.textContent?.trim() ?? '?';
@@ -36,7 +38,10 @@ export class EventsStrategy implements ScraperStrategy {
       .setColor('#313183')
       .setTimestamp();
 
-    return [link, embed];
+    return {
+      embed,
+      id: link,
+    };
   }
 
   public getRequestInit(): RequestInit | undefined {

@@ -1,4 +1,4 @@
-import { type EmbedBuilder } from 'discord.js';
+import type { PostData } from './Post.js';
 
 export type ScraperConfig = {
   cookie?: Record<string, string>;
@@ -13,7 +13,7 @@ export type ScraperConfig = {
 export type ScraperStrategy = {
   defaultCookie?: Record<string, string>;
   getId: (element: Element) => null | string;
-  getPostData: (element: Element) => [null | string, EmbedBuilder];
+  getPostData: (element: Element) => PostData;
   getRequestInit: (cookie: string) => RequestInit | undefined;
   idsSelector: string;
   postsSelector: string;

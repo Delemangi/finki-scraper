@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 
+import type { PostData } from '../lib/Post.js';
+
 import { type ScraperStrategy } from '../lib/Scraper.js';
 import { getConfigProperty } from '../utils/config.js';
 
@@ -17,7 +19,7 @@ export class CourseStrategy implements ScraperStrategy {
     );
   }
 
-  public getPostData(element: Element): [null | string, EmbedBuilder] {
+  public getPostData(element: Element): PostData {
     const link =
       element
         .querySelector('[title="Permanent link to this post"]')
@@ -57,7 +59,10 @@ export class CourseStrategy implements ScraperStrategy {
       .setColor('#313183')
       .setTimestamp();
 
-    return [link, embed];
+    return {
+      embed,
+      id: link,
+    };
   }
 
   public getRequestInit(cookie: string): RequestInit {

@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 
+import type { PostData } from '../lib/Post.js';
+
 import { type ScraperStrategy } from '../lib/Scraper.js';
 import { getConfigProperty } from '../utils/config.js';
 
@@ -14,7 +16,7 @@ export class DiplomasStrategy implements ScraperStrategy {
     return element.querySelector(this.idsSelector)?.textContent?.trim() ?? null;
   }
 
-  public getPostData(element: Element): [null | string, EmbedBuilder] {
+  public getPostData(element: Element): PostData {
     const title =
       element.querySelector('div.panel-heading')?.textContent?.trim() ?? '?';
     const [index, student] = element
@@ -108,7 +110,10 @@ export class DiplomasStrategy implements ScraperStrategy {
       .setColor('#313183')
       .setTimestamp();
 
-    return [title, embed];
+    return {
+      embed,
+      id: link,
+    };
   }
 
   public getRequestInit(cookie: string): RequestInit {
