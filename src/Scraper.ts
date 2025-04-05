@@ -160,9 +160,9 @@ export class Scraper {
   }
 
   private getPostsFromDOM(html: string) {
-    const dom = new JSDOM(html);
+    const { window } = new JSDOM(html);
     const posts = Array.from(
-      dom.window.document.querySelectorAll(this.strategy.postsSelector),
+      window.document.querySelectorAll(this.strategy.postsSelector),
     );
 
     const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
