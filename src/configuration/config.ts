@@ -2,12 +2,9 @@ import type { ColorResolvable } from 'discord.js';
 
 import { readFileSync } from 'node:fs';
 
-import {
-  type ConfigKeys,
-  ConfigSchema,
-  type FullyRequiredConfig,
-} from '../lib/Config.js';
-import { errors } from './constants.js';
+import { type ConfigKeys, ConfigSchema } from '../lib/Config.js';
+import { errors } from '../utils/constants.js';
+import { DEFAULT_CONFIGURATION } from './defaults.js';
 
 const initializeConfig = () => {
   try {
@@ -15,24 +12,14 @@ const initializeConfig = () => {
     const parsedContents: unknown = JSON.parse(contents);
 
     return ConfigSchema.parse(parsedContents);
-  } catch {
-    throw new Error(errors.configParseFailed);
+  } catch (error) {
+    throw new Error(errors.configParseFailed, {
+      cause: error,
+    });
   }
 };
 
 const config = initializeConfig();
-
-const DEFAULT_CONFIGURATION: FullyRequiredConfig = {
-  color: '#313183',
-  coursesCookie: {},
-  diplomasCookie: {},
-  errorDelay: 60_000,
-  maxPosts: 20,
-  scrapers: {},
-  sendPosts: false,
-  successDelay: 180_000,
-  webhook: '',
-} as const;
 
 export const getConfigProperty = <T extends ConfigKeys>(property: T) =>
   config?.[property] ?? DEFAULT_CONFIGURATION[property];

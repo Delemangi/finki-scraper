@@ -2,8 +2,8 @@ import { EmbedBuilder } from 'discord.js';
 
 import type { PostData } from '../lib/Post.js';
 
+import { getThemeColor } from '../configuration/config.js';
 import { type ScraperStrategy } from '../lib/Scraper.js';
-import { getThemeColor } from '../utils/config.js';
 
 export class ProjectsStrategy implements ScraperStrategy {
   public idsSelector = 'a + a';

@@ -5,20 +5,24 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
 import { type Logger } from 'pino';
 
-import { type ScraperConfig, type ScraperStrategy } from '../lib/Scraper.js';
-import { Strategy, StrategySchema } from '../lib/Strategy.js';
-import { AnnouncementsStrategy } from '../strategies/AnnouncementsStrategy.js';
-import { CourseStrategy } from '../strategies/CourseStrategy.js';
-import { DiplomasStrategy } from '../strategies/DiplomasStrategy.js';
-import { EventsStrategy } from '../strategies/EventsStrategy.js';
-import { JobsStrategy } from '../strategies/JobsStrategy.js';
-import { ProjectsStrategy } from '../strategies/ProjectsStrategy.js';
-import { TimetablesStrategy } from '../strategies/TimetablesStrategy.js';
-import { getConfigProperty } from './config.js';
-import { cachePath, errors, messages } from './constants.js';
-import { logger } from './logger.js';
+import { getConfigProperty } from './configuration/config.js';
+import { type ScraperConfig, type ScraperStrategy } from './lib/Scraper.js';
+import { Strategy, StrategySchema } from './lib/Strategy.js';
+import { AnnouncementsStrategy } from './strategies/AnnouncementsStrategy.js';
+import { CourseStrategy } from './strategies/CourseStrategy.js';
+import { DiplomasStrategy } from './strategies/DiplomasStrategy.js';
+import { EventsStrategy } from './strategies/EventsStrategy.js';
+import { JobsStrategy } from './strategies/JobsStrategy.js';
+import { ProjectsStrategy } from './strategies/ProjectsStrategy.js';
+import { TimetablesStrategy } from './strategies/TimetablesStrategy.js';
+import { cachePath, errors, messages } from './utils/constants.js';
+import { logger } from './utils/logger.js';
 
 export class Scraper {
+  public get name() {
+    return this.scraperName;
+  }
+
   private readonly cookie: string;
 
   private readonly logger: Logger;
@@ -103,8 +107,10 @@ export class Scraper {
         this.scraperConfig.link,
         this.strategy.getRequestInit(this.cookie),
       );
-    } catch {
-      throw new Error(errors.fetchFailed);
+    } catch (error) {
+      throw new Error(errors.fetchFailed, {
+        cause: error,
+      });
     }
   }
 
@@ -200,8 +206,10 @@ export class Scraper {
   private async getTextFromResponse(response: Response) {
     try {
       return await response.text();
-    } catch {
-      throw new Error(errors.fetchParseFailed);
+    } catch (error) {
+      throw new Error(errors.fetchParseFailed, {
+        cause: error,
+      });
     }
   }
 

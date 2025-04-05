@@ -2,36 +2,20 @@ import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
 
-import { getConfigProperty } from './utils/config.js';
 import { errors, messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
-import { Scraper } from './utils/Scraper.js';
+import { getNamedScrapers } from './utils/scrapers.js';
 
 const app = express();
 app.use(cors());
+app.use(morgan('combined'));
 
 morgan(':method :url :status :res[content-length] - :response-time ms');
 const port = 3_000;
 
-const names = process.argv.slice(2);
-
 logger.info(messages.initializing);
 
-const scrapers: Record<string, Scraper> = {};
-
-app.use(morgan('combined'));
-
-if (names.length === 0) {
-  for (const [name, cfg] of Object.entries(getConfigProperty('scrapers'))) {
-    if (cfg.enabled) {
-      scrapers[name] = new Scraper(name);
-    }
-  }
-} else {
-  for (const name of names) {
-    scrapers[name] = new Scraper(name);
-  }
-}
+const scrapers = getNamedScrapers();
 
 app.get('/', (_, response) => {
   response.send(messages.appRunning);
