@@ -1,87 +1,97 @@
-import cors from 'cors';
-import express from 'express';
-import morgan from 'morgan';
+import { serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger as honoLogger } from 'hono/logger';
 
 import { errors, messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { getNamedScrapers } from './utils/scrapers.js';
 
-const app = express();
-app.use(cors());
-app.use(morgan('combined'));
+const app = new Hono();
+app.use('*', cors());
+app.use('*', honoLogger());
 
-morgan(':method :url :status :res[content-length] - :response-time ms');
 const port = 3_000;
 
 logger.info(messages.initializing);
 
 const scrapers = getNamedScrapers();
 
-app.get('/', (_, response) => {
-  response.send(messages.appRunning);
-});
+app.get('/', (c) => c.text(messages.appRunning));
 
-app.get('/list', (_, response) => {
-  response.send({
+app.get('/list', (c) =>
+  c.json({
     scrapers: Object.keys(scrapers),
-  });
-});
+  }),
+);
 
-app.get('/get/:name', async (request, response) => {
-  const { name } = request.params;
+app.get('/get/:name', async (c) => {
+  const name = c.req.param('name');
 
   const scraper = scrapers[name];
 
   if (scraper === undefined) {
-    response.status(404).send({
-      error: errors.scraperNotFound,
-    });
-    return;
+    return c.json(
+      {
+        error: errors.scraperNotFound,
+      },
+      404,
+    );
   }
 
   const posts = await scraper.runOnce();
 
   if (posts === null) {
-    response.status(500).send({
-      error: errors.postsNotFound,
-    });
-    return;
+    return c.json(
+      {
+        error: errors.postsNotFound,
+      },
+      500,
+    );
   }
 
-  response.send({
+  return c.json({
     posts,
   });
 });
 
-app.delete('/delete', async (_, response) => {
+app.delete('/delete', async (c) => {
   for (const scraper of Object.values(scrapers)) {
     await scraper.clearCache();
   }
 
-  response.send({
+  return c.json({
     message: messages.cacheCleared,
   });
 });
 
-app.delete('/delete/:name', async (request, response) => {
-  const { name } = request.params;
+app.delete('/delete/:name', async (c) => {
+  const name = c.req.param('name');
 
   const scraper = scrapers[name];
 
   if (scraper === undefined) {
-    response.status(404).send({
-      error: errors.scraperNotFound,
-    });
-    return;
+    return c.json(
+      {
+        error: errors.scraperNotFound,
+      },
+      404,
+    );
   }
 
   await scraper.clearCache();
 
-  response.send({
+  return c.json({
     message: messages.cacheCleared,
   });
 });
 
-app.listen(port, () => {
-  logger.info(messages.appRunning);
-});
+serve(
+  {
+    fetch: app.fetch,
+    port,
+  },
+  () => {
+    logger.info(messages.appRunning);
+  },
+);

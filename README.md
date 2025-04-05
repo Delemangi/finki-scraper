@@ -38,7 +38,7 @@ or
 
 ## Server Mode
 
-You can also run this app in server mode using `npm run serve`, which will boot up an Express based server which will open endpoints for receiving new announcements. In this mode, the app will only scrape new announcements whenever it receives a request to get them, instead of periodically. It is also possible to clear the cache to obtain the same announcements again, as well as to fetch all available scrapers. There is a separate Docker Compose configuration in `docker-compose.server.yaml` for running the app in server mode, and it exposes the port 3000 by default.
+You can also run this app in server mode using `npm run serve`, which will boot up an Hono based server which will open endpoints for receiving new announcements. In this mode, the app will only scrape new announcements whenever it receives a request to get them, instead of periodically. It is also possible to clear the cache to obtain the same announcements again, as well as to fetch all available scrapers. There is a separate Docker Compose configuration in `docker-compose.server.yaml` for running the app in server mode, and it exposes the port 3000 by default.
 
 The exposed endpoints are:
 
