@@ -1,4 +1,9 @@
-import { type EmbedBuilder, roleMention, WebhookClient } from 'discord.js';
+import {
+  type APIEmbed,
+  type EmbedBuilder,
+  roleMention,
+  WebhookClient,
+} from 'discord.js';
 import { JSDOM } from 'jsdom';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -56,14 +61,28 @@ export class Scraper {
     }
   }
 
-  public async clearCache() {
+  public static checkStatusCode(statusCode: number): void {
+    if (statusCode !== 200) {
+      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
+    }
+  }
+
+  public static async sleep(ms: number): Promise<void> {
+    await setTimeout(ms);
+  }
+
+  public async clearCache(): Promise<void> {
     await writeFile(this.getFullCachePath(), '', {
       encoding: 'utf8',
       flag: 'w',
     });
   }
 
-  public async run() {
+  public getFullCachePath(): string {
+    return `./${cachePath}/${this.scraperName}`;
+  }
+
+  public async run(): Promise<void> {
     while (true) {
       this.logger.info(`[${this.scraperName}] ${messages.searching}`);
 
@@ -71,34 +90,23 @@ export class Scraper {
         await this.getAndSendPosts(true);
       } catch (error) {
         await this.handleError(`${error}`);
-        await this.delay(getConfigProperty('errorDelay'));
+        await Scraper.sleep(getConfigProperty('errorDelay'));
 
         continue;
       }
 
-      await this.delay(getConfigProperty('successDelay'));
+      await Scraper.sleep(getConfigProperty('successDelay'));
     }
   }
 
-  public async runOnce() {
+  public async runOnce(): Promise<void> {
     this.logger.info(`[${this.scraperName}] ${messages.searching}`);
 
     try {
-      return await this.getAndSendPosts(false);
+      await this.getAndSendPosts(false);
     } catch (error) {
       await this.handleError(`${error}`);
-      return null;
     }
-  }
-
-  private checkStatusCode(statusCode: number) {
-    if (statusCode !== 200) {
-      throw new Error(`${errors.badResponseCode}: ${statusCode}`);
-    }
-  }
-
-  private async delay(milliseconds: number) {
-    await setTimeout(milliseconds);
   }
 
   private async fetchData(): Promise<Response> {
@@ -114,10 +122,10 @@ export class Scraper {
     }
   }
 
-  private async getAndSendPosts(checkCache: boolean) {
+  private async getAndSendPosts(checkCache: boolean): Promise<APIEmbed[]> {
     const response = await this.fetchData();
 
-    this.checkStatusCode(response.status);
+    Scraper.checkStatusCode(response.status);
 
     const text = await this.getTextFromResponse(response);
     const cache = await this.readCacheFile();
@@ -131,7 +139,7 @@ export class Scraper {
     }
 
     const validPosts = await this.processNewPosts(posts, cache, checkCache);
-    await this.writeCacheFile(this.getFullCachePath(), ids);
+    await this.writeCacheFile(ids);
 
     const sendPosts = getConfigProperty('sendPosts');
 
@@ -151,11 +159,7 @@ export class Scraper {
       .join('; ');
   }
 
-  private getFullCachePath(): string {
-    return `./${cachePath}/${this.scraperName}`;
-  }
-
-  private getIdsFromPosts(posts: Element[]) {
+  private getIdsFromPosts(posts: Element[]): Array<null | string> {
     return posts.map((post) => this.strategy.getId(post));
   }
 
@@ -203,7 +207,7 @@ export class Scraper {
     }
   }
 
-  private async getTextFromResponse(response: Response) {
+  private async getTextFromResponse(response: Response): Promise<string> {
     try {
       return await response.text();
     } catch (error) {
@@ -213,7 +217,7 @@ export class Scraper {
     }
   }
 
-  private async handleError(message: string) {
+  private async handleError(message: string): Promise<void> {
     this.logger.error(`[${this.scraperName}] ${message}`);
     await this.webhook?.send({
       content: message,
@@ -232,7 +236,7 @@ export class Scraper {
     posts: Element[],
     cache: string[],
     checkCache: boolean,
-  ) {
+  ): Promise<APIEmbed[]> {
     const allPosts =
       cache.length === 0
         ? posts.toReversed()
@@ -273,7 +277,7 @@ export class Scraper {
     return validPosts.map((embed) => embed.data);
   }
 
-  private async readCacheFile() {
+  private async readCacheFile(): Promise<string[]> {
     if (!existsSync(cachePath)) {
       await mkdir(cachePath, {
         recursive: true,
@@ -288,7 +292,7 @@ export class Scraper {
     return content.trim().split('\n').filter(Boolean);
   }
 
-  private async sendPost(embed: EmbedBuilder, id: string) {
+  private async sendPost(embed: EmbedBuilder, id: string): Promise<void> {
     await this.webhook?.send({
       content:
         this.scraperConfig.role === undefined || this.scraperConfig.role === ''
@@ -300,7 +304,10 @@ export class Scraper {
     this.logger.info(`[${this.scraperName}] ${messages.postSent}: ${id}`);
   }
 
-  private async writeCacheFile(path: string, ids: Array<null | string>) {
-    await writeFile(path, ids.join('\n'), { encoding: 'utf8', flag: 'w' });
+  private async writeCacheFile(ids: Array<null | string>): Promise<void> {
+    await writeFile(this.getFullCachePath(), ids.join('\n'), {
+      encoding: 'utf8',
+      flag: 'w',
+    });
   }
 }
