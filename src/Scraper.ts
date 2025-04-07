@@ -99,13 +99,14 @@ export class Scraper {
     }
   }
 
-  public async runOnce(): Promise<void> {
+  public async runOnce(): Promise<APIEmbed[] | null> {
     this.logger.info(`[${this.scraperName}] ${messages.searching}`);
 
     try {
-      await this.getAndSendPosts(false);
+      return await this.getAndSendPosts(false);
     } catch (error) {
       await this.handleError(`${error}`);
+      return null;
     }
   }
 
