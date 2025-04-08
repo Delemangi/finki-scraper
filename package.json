@@ -6,7 +6,7 @@
   "dependencies": {
     "@hono/node-server": "^1.14.0",
     "discord.js": "^14.18.0",
-    "hono": "^4.7.5",
+    "hono": "^4.7.6",
     "jsdom": "^26.0.0",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
