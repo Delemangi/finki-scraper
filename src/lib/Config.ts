@@ -7,6 +7,7 @@ export const RequiredConfigSchema = z.object({
   coursesCookie: z.record(z.string()).optional(),
   diplomasCookie: z.record(z.string()).optional(),
   errorDelay: z.number().optional(),
+  errorWebhook: z.string().optional(),
   maxPosts: z.number().optional(),
   scrapers: z.record(ScraperConfigSchema).optional(),
   sendPosts: z.boolean().optional(),

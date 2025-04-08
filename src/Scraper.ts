@@ -22,6 +22,7 @@ import { ProjectsStrategy } from './strategies/ProjectsStrategy.js';
 import { TimetablesStrategy } from './strategies/TimetablesStrategy.js';
 import { cachePath, errors, messages } from './utils/constants.js';
 import { logger } from './utils/logger.js';
+import { errorWebhook } from './utils/webhooks.js';
 
 export class Scraper {
   public get name() {
@@ -220,7 +221,7 @@ export class Scraper {
 
   private async handleError(message: string): Promise<void> {
     this.logger.error(`[${this.scraperName}] ${message}`);
-    await this.webhook?.send({
+    await (errorWebhook ?? this.webhook)?.send({
       content: message,
       username: this.scraperConfig.name ?? this.scraperName,
     });

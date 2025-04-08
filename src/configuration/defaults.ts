@@ -5,6 +5,7 @@ export const DEFAULT_CONFIGURATION: FullyRequiredConfig = {
   coursesCookie: {},
   diplomasCookie: {},
   errorDelay: 60_000,
+  errorWebhook: '',
   maxPosts: 20,
   scrapers: {},
   sendPosts: false,
