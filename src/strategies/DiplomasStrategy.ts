@@ -1,16 +1,41 @@
 import { EmbedBuilder } from 'discord.js';
+import { CasAuthentication } from 'finki-auth';
+import { Service } from 'finki-auth/dist/lib/Service.js';
 
 import type { PostData } from '../lib/Post.js';
 
 import { getConfigProperty, getThemeColor } from '../configuration/config.js';
 import { type ScraperStrategy } from '../lib/Scraper.js';
+import { getCookieHeader } from '../utils/cookies.js';
 
 export class DiplomasStrategy implements ScraperStrategy {
-  public defaultCookie = getConfigProperty('diplomasCookie');
-
   public idsSelector = 'div.panel-heading';
 
   public postsSelector = 'div.panel';
+
+  public async getCookie(): Promise<string> {
+    const credentials = getConfigProperty('credentials');
+
+    if (credentials === undefined) {
+      throw new Error(
+        'Credentials are not defined. Please check your configuration.',
+      );
+    }
+
+    const auth = new CasAuthentication(
+      credentials.username,
+      credentials.password,
+    );
+
+    const rawCookies = await auth.authenticate(Service.DIPLOMAS);
+    const cookies: Record<string, string> = {};
+
+    for (const cookie of rawCookies) {
+      cookies[cookie.key] = cookie.value;
+    }
+
+    return getCookieHeader(cookies);
+  }
 
   public getId(element: Element): null | string {
     return element.querySelector(this.idsSelector)?.textContent?.trim() ?? null;
@@ -116,10 +141,18 @@ export class DiplomasStrategy implements ScraperStrategy {
     };
   }
 
-  public getRequestInit(cookie: string): RequestInit {
+  public getRequestInit(cookie: string | undefined): RequestInit | undefined {
+    if (cookie === undefined) {
+      return undefined;
+    }
+
     return {
-      credentials: 'same-origin',
-      headers: { Cookie: cookie },
+      credentials: 'include',
+      headers: {
+        Cookie: cookie,
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+      },
     };
   }
 }

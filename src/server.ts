@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger as honoLogger } from 'hono/logger';
 
-import { errors, messages } from './utils/constants.js';
+import { ERROR_MESSAGES, LOG_MESSAGES } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { getNamedScrapers } from './utils/scrapers.js';
 
@@ -13,11 +13,11 @@ app.use('*', honoLogger());
 
 const port = 3_000;
 
-logger.info(messages.initializing);
+logger.info(LOG_MESSAGES.initializing);
 
 const scrapers = getNamedScrapers();
 
-app.get('/', (c) => c.text(messages.appRunning));
+app.get('/', (c) => c.text(LOG_MESSAGES.appRunning));
 
 app.get('/list', (c) =>
   c.json({
@@ -33,7 +33,7 @@ app.get('/get/:name', async (c) => {
   if (scraper === undefined) {
     return c.json(
       {
-        error: errors.scraperNotFound,
+        error: ERROR_MESSAGES.scraperNotFound,
       },
       404,
     );
@@ -44,7 +44,7 @@ app.get('/get/:name', async (c) => {
   if (posts === null) {
     return c.json(
       {
-        error: errors.postsNotFound,
+        error: ERROR_MESSAGES.postsNotFound,
       },
       500,
     );
@@ -61,7 +61,7 @@ app.delete('/delete', async (c) => {
   }
 
   return c.json({
-    message: messages.cacheCleared,
+    message: LOG_MESSAGES.cacheCleared,
   });
 });
 
@@ -73,7 +73,7 @@ app.delete('/delete/:name', async (c) => {
   if (scraper === undefined) {
     return c.json(
       {
-        error: errors.scraperNotFound,
+        error: ERROR_MESSAGES.scraperNotFound,
       },
       404,
     );
@@ -82,7 +82,7 @@ app.delete('/delete/:name', async (c) => {
   await scraper.clearCache();
 
   return c.json({
-    message: messages.cacheCleared,
+    message: LOG_MESSAGES.cacheCleared,
   });
 });
 
@@ -92,6 +92,6 @@ serve(
     port,
   },
   () => {
-    logger.info(messages.appRunning);
+    logger.info(LOG_MESSAGES.appRunning);
   },
 );

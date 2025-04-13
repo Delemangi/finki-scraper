@@ -7,6 +7,8 @@ import { getThemeColor } from '../configuration/config.js';
 import { normalizeURL } from '../utils/links.js';
 
 export class TimetablesStrategy implements ScraperStrategy {
+  public getCookie = undefined;
+
   public idsSelector = 'a';
 
   public postsSelector = 'div.col-sm-11';

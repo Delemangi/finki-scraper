@@ -1,10 +1,10 @@
 import { setTimeout } from 'node:timers/promises';
 
-import { messages } from './utils/constants.js';
+import { LOG_MESSAGES } from './utils/constants.js';
 import { logger } from './utils/logger.js';
 import { getNamedScrapers } from './utils/scrapers.js';
 
-logger.info(messages.initializing);
+logger.info(LOG_MESSAGES.initializing);
 
 const scrapers = getNamedScrapers();
 

@@ -1,16 +1,41 @@
 import { EmbedBuilder } from 'discord.js';
+import { CasAuthentication } from 'finki-auth';
+import { Service } from 'finki-auth/dist/lib/Service.js';
 
 import type { PostData } from '../lib/Post.js';
 
 import { getConfigProperty, getThemeColor } from '../configuration/config.js';
 import { type ScraperStrategy } from '../lib/Scraper.js';
+import { getCookieHeader } from '../utils/cookies.js';
 
 export class CourseStrategy implements ScraperStrategy {
-  public defaultCookie = getConfigProperty('coursesCookie');
-
   public idsSelector = '[title="Permanent link to this post"]';
 
   public postsSelector = 'article';
+
+  public async getCookie(): Promise<string> {
+    const credentials = getConfigProperty('credentials');
+
+    if (credentials === undefined) {
+      throw new Error(
+        'Credentials are not defined. Please check your configuration.',
+      );
+    }
+
+    const auth = new CasAuthentication(
+      credentials.username,
+      credentials.password,
+    );
+
+    const rawCookies = await auth.authenticate(Service.COURSES);
+    const cookies: Record<string, string> = {};
+
+    for (const { key, value } of rawCookies) {
+      cookies[key] = value;
+    }
+
+    return getCookieHeader(cookies);
+  }
 
   public getId(element: Element): null | string {
     return (
@@ -65,10 +90,16 @@ export class CourseStrategy implements ScraperStrategy {
     };
   }
 
-  public getRequestInit(cookie: string): RequestInit {
+  public getRequestInit(cookie: string | undefined): RequestInit | undefined {
+    if (cookie === undefined) {
+      return undefined;
+    }
+
     return {
-      credentials: 'omit',
-      headers: { Cookie: cookie },
+      credentials: 'include',
+      headers: {
+        Cookie: cookie,
+      },
     };
   }
 }

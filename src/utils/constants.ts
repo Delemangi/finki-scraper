@@ -1,15 +1,16 @@
-export const messages = {
+export const LOG_MESSAGES = {
   appRunning: 'App running',
   cacheCleared: 'Cache cleared',
+  fetchedCookie: 'Fetched cookie',
   initializing: 'Initializing...',
   noNewPosts: 'No new posts',
   postAlreadySent: 'Post already sent',
   postSent: 'Post sent',
   searching: 'Searching...',
   sentNewPosts: 'Sent new posts',
-};
+} as const;
 
-export const errors = {
+export const ERROR_MESSAGES = {
   badResponseCode: 'Bad response code',
   configParseFailed: 'Failed to parse configuration file',
   fetchFailed: 'Failed to fetch',
@@ -19,6 +20,6 @@ export const errors = {
   postsNotFound: 'Posts not found',
   scraperNotFound: 'Scraper not found',
   strategyNotFound: 'Strategy not found',
-};
+} as const;
 
-export const cachePath = 'cache';
+export const CACHE_PATH = 'cache';

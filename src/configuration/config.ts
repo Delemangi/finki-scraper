@@ -3,7 +3,7 @@ import type { ColorResolvable } from 'discord.js';
 import { readFileSync } from 'node:fs';
 
 import { type ConfigKeys, ConfigSchema } from '../lib/Config.js';
-import { errors } from '../utils/constants.js';
+import { ERROR_MESSAGES } from '../utils/constants.js';
 import { DEFAULT_CONFIGURATION } from './defaults.js';
 
 const initializeConfig = () => {
@@ -13,7 +13,7 @@ const initializeConfig = () => {
 
     return ConfigSchema.parse(parsedContents);
   } catch (error) {
-    throw new Error(errors.configParseFailed, {
+    throw new Error(ERROR_MESSAGES.configParseFailed, {
       cause: error,
     });
   }

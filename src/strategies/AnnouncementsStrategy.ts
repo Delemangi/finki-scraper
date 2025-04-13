@@ -6,6 +6,8 @@ import { getThemeColor } from '../configuration/config.js';
 import { type ScraperStrategy } from '../lib/Scraper.js';
 
 export class AnnouncementsStrategy implements ScraperStrategy {
+  public getCookie = undefined;
+
   public idsSelector = 'a';
 
   public postsSelector = 'div.views-row';
