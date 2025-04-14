@@ -12,12 +12,12 @@ For development purposes, be sure to run `npm run prepare` to install the Git pr
 
 ### Installation (Docker)
 
-1. `git clone git@github.com:Delemangi/finki-scraper.git`
+1. `git clone git@github.com:finki-hub/finki-scraper.git`
 2. `docker compose build`
 
 ### Installation (Normal)
 
-1. `git clone git@github.com:Delemangi/finki-scraper.git`
+1. `git clone git@github.com:finki-hub/finki-scraper.git`
 2. `npm install`
 
 ## Running
