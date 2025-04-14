@@ -13,6 +13,8 @@ export class DiplomasStrategy implements ScraperStrategy {
 
   public postsSelector = 'div.panel';
 
+  public scraperService = Service.DIPLOMAS;
+
   public async getCookie(): Promise<string> {
     const credentials = getConfigProperty('credentials');
 

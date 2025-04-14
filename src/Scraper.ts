@@ -4,6 +4,7 @@ import {
   roleMention,
   WebhookClient,
 } from 'discord.js';
+import { isCookieValid } from 'finki-auth';
 import { JSDOM } from 'jsdom';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -67,7 +68,6 @@ export class Scraper {
 
   public checkStatusCode(statusCode: number): void {
     if (statusCode === 401) {
-      this.cookie = undefined;
       throw new Error(`${ERROR_MESSAGES.badResponseCode}: ${statusCode}`);
     }
 
@@ -91,6 +91,8 @@ export class Scraper {
     while (true) {
       this.logger.info(`[${this.scraperName}] ${LOG_MESSAGES.searching}`);
 
+      await this.validateCookie();
+
       try {
         await this.getAndSendPosts(true);
       } catch (error) {
@@ -107,6 +109,8 @@ export class Scraper {
   public async runOnce(): Promise<APIEmbed[] | null> {
     this.logger.info(`[${this.scraperName}] ${LOG_MESSAGES.searching}`);
 
+    await this.validateCookie();
+
     try {
       return await this.getAndSendPosts(false);
     } catch (error) {
@@ -115,16 +119,34 @@ export class Scraper {
     }
   }
 
+  public async validateCookie(): Promise<void> {
+    const usesCookies = this.strategy.getCookie !== undefined;
+
+    if (!usesCookies) {
+      return;
+    }
+
+    const isValidCookie = Boolean(
+      this.strategy.scraperService &&
+        this.cookie &&
+        (await isCookieValid(this.strategy.scraperService, this.cookie)),
+    );
+
+    if (!isValidCookie) {
+      this.logger.info(`[${this.scraperName}] ${LOG_MESSAGES.cookieInvalid}`);
+      this.cookie = undefined;
+    }
+  }
+
   private async fetchData(): Promise<Response> {
     try {
       const response = await fetch(
         this.scraperConfig.link,
-        this.strategy.getRequestInit(this.cookie),
+        this.strategy.getRequestInit?.(this.cookie),
       );
 
       return response;
     } catch (error) {
-      this.cookie = undefined;
       throw new Error(ERROR_MESSAGES.fetchFailed, {
         cause: error,
       });
@@ -177,7 +199,6 @@ export class Scraper {
     const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
 
     if (lastPosts.length === 0) {
-      this.cookie = undefined;
       throw new Error(ERROR_MESSAGES.postsNotFound);
     }
 

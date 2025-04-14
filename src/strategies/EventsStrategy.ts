@@ -6,8 +6,6 @@ import { getThemeColor } from '../configuration/config.js';
 import { type ScraperStrategy } from '../lib/Scraper.js';
 
 export class EventsStrategy implements ScraperStrategy {
-  public getCookie = undefined;
-
   public idsSelector = 'a + a';
 
   public postsSelector = 'div.news-item';
@@ -45,9 +43,5 @@ export class EventsStrategy implements ScraperStrategy {
       embed,
       id: this.getId(element),
     };
-  }
-
-  public getRequestInit(): RequestInit | undefined {
-    return undefined;
   }
 }

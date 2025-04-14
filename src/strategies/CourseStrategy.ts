@@ -13,6 +13,8 @@ export class CourseStrategy implements ScraperStrategy {
 
   public postsSelector = 'article';
 
+  public scraperService = Service.COURSES;
+
   public async getCookie(): Promise<string> {
     const credentials = getConfigProperty('credentials');
 

@@ -1,6 +1,7 @@
 export const LOG_MESSAGES = {
   appRunning: 'App running',
   cacheCleared: 'Cache cleared',
+  cookieInvalid: 'Cookie is invalid',
   fetchedCookie: 'Fetched cookie',
   initializing: 'Initializing...',
   noNewPosts: 'No new posts',
