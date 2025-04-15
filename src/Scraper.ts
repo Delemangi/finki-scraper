@@ -19,6 +19,7 @@ import { CourseStrategy } from './strategies/CourseStrategy.js';
 import { DiplomasStrategy } from './strategies/DiplomasStrategy.js';
 import { EventsStrategy } from './strategies/EventsStrategy.js';
 import { JobsStrategy } from './strategies/JobsStrategy.js';
+import { PartnersStrategy } from './strategies/PartnersStrategy.js';
 import { ProjectsStrategy } from './strategies/ProjectsStrategy.js';
 import { TimetablesStrategy } from './strategies/TimetablesStrategy.js';
 import { CACHE_PATH, ERROR_MESSAGES, LOG_MESSAGES } from './utils/constants.js';
@@ -196,7 +197,10 @@ export class Scraper {
       window.document.querySelectorAll(this.strategy.postsSelector),
     );
 
-    const lastPosts = posts.slice(0, getConfigProperty('maxPosts'));
+    const maxPosts =
+      this.scraperConfig.maxPosts ?? getConfigProperty('maxPosts');
+
+    const lastPosts = posts.slice(0, maxPosts);
 
     if (lastPosts.length === 0) {
       throw new Error(ERROR_MESSAGES.postsNotFound);
@@ -225,6 +229,8 @@ export class Scraper {
         return new EventsStrategy();
       case Strategy.Jobs:
         return new JobsStrategy();
+      case Strategy.Partners:
+        return new PartnersStrategy();
       case Strategy.Projects:
         return new ProjectsStrategy();
       case Strategy.Timetables:

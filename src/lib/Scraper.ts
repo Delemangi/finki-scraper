@@ -7,6 +7,7 @@ import type { PostData } from './Post.js';
 export const ScraperConfigSchema = z.object({
   enabled: z.boolean().optional(),
   link: z.string(),
+  maxPosts: z.number().optional(),
   name: z.string().optional(),
   role: z.string().optional(),
   strategy: z.string(),
