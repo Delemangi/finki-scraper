@@ -56,4 +56,4 @@ The `<name>` parameter is what is specified in the configuration.
 
 ## License
 
-This project is licensed under the MIT license.
+This project is licensed under the terms of the MIT license.
