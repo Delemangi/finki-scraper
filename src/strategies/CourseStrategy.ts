@@ -1,6 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import { CasAuthentication } from 'finki-auth';
-import { Service } from 'finki-auth/dist/lib/Service.js';
+import { CasAuthentication, Service } from 'finki-auth';
 
 import type { PostData } from '../lib/Post.js';
 
