@@ -1,0 +1,73 @@
+{
+  "color": "#ff0000",
+  "credentials": {
+    "username": "your_cas_username",
+    "password": "your_cas_password"
+  },
+  "errorDelay": 60000,
+  "errorWebhook": "your_error_webhook",
+  "maxPosts": 20,
+  "sendPosts": true,
+  "successDelay": 180000,
+  "webhook": "your_global_webhook",
+  "scrapers": {
+    "announcements": {
+      "strategy": "announcements",
+      "link": "https://www.finki.ukim.mk/mk/student-announcement",
+      "name": "Огласна табла",
+      "role": "1333926602739810427",
+      "webhook": "your_announcement_webhook",
+      "enabled": true
+    },
+    "jobs": {
+      "strategy": "jobs",
+      "link": "https://www.finki.ukim.mk/mk/fcse-jobs-internships",
+      "name": "Огласи",
+      "webhook": "your_jobs_webhook",
+      "enabled": true
+    },
+    "events": {
+      "strategy": "events",
+      "link": "https://finki.ukim.mk/mk/fcse-events",
+      "name": "Настани",
+      "enabled": false
+    },
+    "projects": {
+      "strategy": "projects",
+      "link": "https://finki.ukim.mk/mk/fcse-projects",
+      "name": "Проекти",
+      "enabled": false
+    },
+    "diplomas": {
+      "strategy": "diplomas",
+      "link": "https://diplomski.finki.ukim.mk/DiplomaList",
+      "name": "Дипломски",
+      "enabled": false
+    },
+    "SIC": {
+      "strategy": "course",
+      "link": "https://courses.finki.ukim.mk/mod/forum/search.php?id=263&words=&phrase=&notwords=&fullwords=&hfromday=1&hfrommonth=1&hfromyear=1&hfromhour=1&hfromminute=1&htoday=1&htomonth=1&htoyear=1&htohour=1&htominute=1&forumid=486&subject=&user=&perpage=10",
+      "name": "Студентски информативен центар",
+      "enabled": true
+    },
+    "dnick": {
+      "strategy": "course",
+      "link": "https://courses.finki.ukim.mk/mod/forum/search.php?id=2631&words=&phrase=&notwords=&fullwords=&hfromday=1&hfrommonth=1&hfromyear=1&hfromhour=1&hfromminute=1&htoday=1&htomonth=1&htoyear=1&htohour=1&htominute=1&forumid=4101&subject=&user=&perpage=10",
+      "name": "Дизајн на интеракцијата човек-компјутер",
+      "enabled": false
+    },
+    "timetables": {
+      "strategy": "timetables",
+      "link": "https://www.finki.ukim.mk/mk/student-announcement",
+      "name": "Распореди",
+      "enabled": false
+    },
+    "partners": {
+      "strategy": "partners",
+      "link": "https://partneri.finki.ukim.mk/partners",
+      "name": "Партнери",
+      "maxPosts": 100,
+      "enabled": true
+    }
+  }
+}

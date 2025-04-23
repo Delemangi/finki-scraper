@@ -190,7 +190,7 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # Configuration
-config
+config.json
 
 # Cache
 cache
