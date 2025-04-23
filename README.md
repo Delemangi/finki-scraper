@@ -4,7 +4,7 @@ Tooling for scraping and providing publicly available data from FCSE services. T
 
 ## Architecture
 
-The scrapers are implemented as classes (called strategies) which contain several selectors and methods for fetching the data from each container (post, announcement, etc). Adding a new service requires creating a new strategy and
+The scrapers are implemented as classes (called strategies) which contain several selectors and methods for fetching the data from each container (post, announcement, etc). Adding a new service requires creating a new strategy and linking it. See [the example strategy](./src/strategies/ExampleStrategy.ts) for more info.
 
 ## Quick Setup (Production)
 
