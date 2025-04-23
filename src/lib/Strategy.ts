@@ -5,6 +5,7 @@ export enum Strategy {
   Course = 'course',
   Diplomas = 'diplomas',
   Events = 'events',
+  Example = 'example',
   Jobs = 'jobs',
   Partners = 'partners',
   Projects = 'projects',

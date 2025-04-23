@@ -18,6 +18,7 @@ import { AnnouncementsStrategy } from './strategies/AnnouncementsStrategy.js';
 import { CourseStrategy } from './strategies/CourseStrategy.js';
 import { DiplomasStrategy } from './strategies/DiplomasStrategy.js';
 import { EventsStrategy } from './strategies/EventsStrategy.js';
+import { ExampleStrategy } from './strategies/ExampleStrategy.js';
 import { JobsStrategy } from './strategies/JobsStrategy.js';
 import { PartnersStrategy } from './strategies/PartnersStrategy.js';
 import { ProjectsStrategy } from './strategies/ProjectsStrategy.js';
@@ -227,6 +228,8 @@ export class Scraper {
         return new DiplomasStrategy();
       case Strategy.Events:
         return new EventsStrategy();
+      case Strategy.Example:
+        return new ExampleStrategy();
       case Strategy.Jobs:
         return new JobsStrategy();
       case Strategy.Partners:
