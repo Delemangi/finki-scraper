@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.14.0",
-    "discord.js": "^14.19.2",
+    "discord.js": "^14.19.3",
     "finki-auth": "^1.2.2",
     "hono": "^4.7.8",
     "jsdom": "^26.1.0",
