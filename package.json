@@ -16,7 +16,7 @@
   "description": "FINKI Scraper",
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
-    "esbuild": "^0.25.3",
+    "esbuild": "^0.25.4",
     "eslint": "^9.26.0",
     "eslint-config-imperium": "^2.2.0",
     "husky": "^9.1.7",
