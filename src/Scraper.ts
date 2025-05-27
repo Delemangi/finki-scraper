@@ -273,6 +273,7 @@ export class Scraper {
     cache: string[],
     checkCache: boolean,
   ): Promise<APIEmbed[]> {
+    // TODO: Consider moving to ScraperStrategy
     const isCourses =
       this.scraperConfig.strategy === Strategy.Course.toString();
 
