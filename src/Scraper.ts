@@ -273,8 +273,11 @@ export class Scraper {
     cache: string[],
     checkCache: boolean,
   ): Promise<APIEmbed[]> {
+    const isCourses =
+      this.scraperConfig.strategy === Strategy.Course.toString();
+
     const allPosts =
-      cache.length === 0
+      !isCourses || cache.length === 0
         ? posts.toReversed()
         : posts.toReversed().slice(0.3 * posts.length);
     const validPosts: EmbedBuilder[] = [];
