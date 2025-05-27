@@ -32,7 +32,7 @@
   "name": "finki-scraper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Delemangi/finki-scraper.git"
+    "url": "git+https://github.com/Delemangi/finki-scraper.git"
   },
   "scripts": {
     "build": "npm run clean && node esbuild.config.js",
