@@ -5,30 +5,48 @@ import type { ScraperStrategy } from '../lib/Scraper.js';
 
 import { getThemeColor } from '../configuration/config.js';
 
+const PARTNER_LABELS = ['Gold partner', 'Silver partner'] as const;
+
+const cleanPartnerName = (name: null | string): null | string => {
+  if (name === null) {
+    return null;
+  }
+
+  let cleanedName = name;
+
+  for (const label of PARTNER_LABELS) {
+    cleanedName = cleanedName.replace(label, '').trim();
+  }
+
+  return cleanedName.replaceAll(/\s+/gu, ' ').trim();
+};
+
+const isSupportedByPartner = (url: string): boolean => url.includes('a1.com');
+
 export class PartnersStrategy implements ScraperStrategy {
   public idsSelector = 'a';
 
   public postsSelector = 'div.card, div.support';
 
   public getId(element: Element): null | string {
-    const url = element
-      .querySelector(this.idsSelector)
-      ?.getAttribute('href')
-      ?.trim();
+    const url =
+      element.querySelector('a')?.getAttribute('href')?.trim() ?? null;
 
-    const name = element.textContent?.trim();
+    if (url && isSupportedByPartner(url)) {
+      return 'A1';
+    }
 
-    return url ?? name ?? null;
+    const name = cleanPartnerName(element.textContent);
+
+    return name ?? null;
   }
 
   public getPostData(element: Element): PostData {
     const url =
       element.querySelector('a')?.getAttribute('href')?.trim() ?? null;
-    let name =
-      // eslint-disable-next-line regexp/no-super-linear-move
-      element.textContent?.replaceAll(/.*partner/giu, '').trim() ?? '?';
+    let name = cleanPartnerName(element.textContent) ?? '?';
 
-    if (name.length === 0) {
+    if (url && isSupportedByPartner(url)) {
       name = 'A1';
     }
 
