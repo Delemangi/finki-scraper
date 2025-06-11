@@ -11,7 +11,7 @@
     "jsdom": "^26.1.0",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
-    "zod": "^3.25.57"
+    "zod": "^3.25.61"
   },
   "description": "FINKI Scraper",
   "devDependencies": {
