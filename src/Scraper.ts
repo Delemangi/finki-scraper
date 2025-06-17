@@ -274,8 +274,8 @@ export class Scraper {
     checkCache: boolean,
   ): Promise<APIEmbed[]> {
     // TODO: Consider moving to ScraperStrategy
-    const isCourses =
-      this.scraperConfig.strategy === Strategy.Course.toString();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+    const isCourses = this.scraperConfig.strategy === Strategy.Course;
 
     const allPosts =
       !isCourses || cache.length === 0
