@@ -14,3 +14,26 @@ config
 
 # Environment variables
 .env
+
+# SonarCloud
+.sonarcloud.properties
+
+# EditorConfig
+.editorconfig
+
+# ESLint
+.eslint*
+eslint.config.js
+
+# Git
+.gitattributes
+.gitignore
+
+# GitHub
+.github/
+LICENSE
+*.md
+
+# Docker
+compose.yaml
+compose.*.yaml
