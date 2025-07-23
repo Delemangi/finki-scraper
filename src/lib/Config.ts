@@ -3,8 +3,8 @@ import { z } from 'zod';
 import { ScraperConfigSchema } from './Scraper.js';
 
 const CookiesSchema = z.object({
-  courses: z.record(z.string()).optional(),
-  diplomas: z.record(z.string()).optional(),
+  courses: z.record(z.string(), z.string()).optional(),
+  diplomas: z.record(z.string(), z.string()).optional(),
 });
 
 export const CookiesKeysSchema = CookiesSchema.keyof();
@@ -21,7 +21,7 @@ export const RequiredConfigSchema = z.object({
   errorDelay: z.number().optional(),
   errorWebhook: z.string().optional(),
   maxPosts: z.number().optional(),
-  scrapers: z.record(ScraperConfigSchema).optional(),
+  scrapers: z.record(z.string(), ScraperConfigSchema).optional(),
   sendPosts: z.boolean().optional(),
   successDelay: z.number().optional(),
   webhook: z.string().optional(),

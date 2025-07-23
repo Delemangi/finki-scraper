@@ -34,7 +34,7 @@ You can select which scrapers to run declaratively (in the configuration with th
 ## Quick Setup (Development)
 
 1. Clone the repository: `git clone https://github.com/finki-hub/finki-scraper.git`
-2. Install dependencies (and pre-commit hooks): `npm i`
+2. Install dependencies: `npm i`
 3. Prepare configuration: `cp config/config.sample.json config/config.json`
 4. Build the project: `npm run build`
 5. Run it: `npm run start`

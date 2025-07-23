@@ -11,7 +11,7 @@
     "jsdom": "^26.1.0",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
-    "zod": "^3.25.76"
+    "zod": "^4.0.5"
   },
   "description": "FINKI Scraper",
   "devDependencies": {
@@ -19,7 +19,6 @@
     "esbuild": "^0.25.8",
     "eslint": "^9.31.0",
     "eslint-config-imperium": "^2.5.0",
-    "husky": "^9.1.7",
     "rimraf": "^6.0.1",
     "typescript": "~5.8.3"
   },
@@ -39,7 +38,6 @@
     "clean": "rimraf dist",
     "format": "eslint . --cache --fix",
     "lint": "tsc --noEmit && eslint . --cache",
-    "prepare": "husky",
     "serve": "node dist/server.js",
     "start": "node dist/index.js"
   },

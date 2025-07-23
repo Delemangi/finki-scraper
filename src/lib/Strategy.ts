@@ -12,4 +12,4 @@ export enum Strategy {
   Timetables = 'timetables',
 }
 
-export const StrategySchema = z.nativeEnum(Strategy);
+export const StrategySchema = z.enum(Strategy);
