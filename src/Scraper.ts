@@ -277,14 +277,7 @@ export class Scraper {
     cache: string[],
     checkCache: boolean,
   ): Promise<APIEmbed[]> {
-    // TODO: Consider moving to ScraperStrategy
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-    const isCourses = this.scraperConfig.strategy === Strategy.Course;
-
-    const allPosts =
-      !isCourses || cache.length === 0
-        ? posts.toReversed()
-        : posts.toReversed().slice(0.3 * posts.length);
+    const allPosts = this.strategy.filterPosts?.(posts) ?? posts.toReversed();
     const validPosts: EmbedBuilder[] = [];
     const sendPosts = getConfigProperty('sendPosts');
 
