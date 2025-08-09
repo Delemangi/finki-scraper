@@ -12,8 +12,12 @@ import { setTimeout } from 'node:timers/promises';
 import { type Logger } from 'pino';
 
 import { getConfigProperty } from './configuration/config.js';
-import { type ScraperConfig, type ScraperStrategy } from './lib/Scraper.js';
-import { Strategy, StrategySchema } from './lib/Strategy.js';
+import {
+  type ScraperConfig,
+  type ScraperStrategy,
+  Strategy,
+  StrategySchema,
+} from './lib/Scraper.js';
 import { AnnouncementsStrategy } from './strategies/AnnouncementsStrategy.js';
 import { CourseStrategy } from './strategies/CourseStrategy.js';
 import { DiplomasStrategy } from './strategies/DiplomasStrategy.js';

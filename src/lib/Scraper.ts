@@ -14,6 +14,18 @@ export const ScraperConfigSchema = z.object({
   webhook: z.string().optional(),
 });
 
+export enum Strategy {
+  Announcements = 'announcements',
+  Course = 'course',
+  Diplomas = 'diplomas',
+  Events = 'events',
+  Example = 'example',
+  Jobs = 'jobs',
+  Partners = 'partners',
+  Projects = 'projects',
+  Timetables = 'timetables',
+}
+
 export type ScraperConfig = z.infer<typeof ScraperConfigSchema>;
 
 export type ScraperStrategy = {
@@ -25,3 +37,5 @@ export type ScraperStrategy = {
   postsSelector: string;
   scraperService?: Service;
 };
+
+export const StrategySchema = z.enum(Strategy);
