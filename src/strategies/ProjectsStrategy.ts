@@ -21,11 +21,11 @@ export class ProjectsStrategy implements ScraperStrategy {
   public getPostData(element: Element): PostData {
     const url = element.querySelector('a + a')?.getAttribute('href')?.trim();
     const link = url === undefined ? null : `https://finki.ukim.mk${url}`;
-    const title = element.querySelector('a + a')?.textContent?.trim() ?? '?';
+    const title = element.querySelector('a + a')?.textContent.trim() ?? '?';
     const content =
       element
         .querySelector('div.col-xs-12.col-sm-8 > div.field-content')
-        ?.textContent?.trim()
+        ?.textContent.trim()
         .slice(0, 500) ?? '?';
     const image =
       element.querySelector('img')?.getAttribute('src')?.split('?').at(0) ??

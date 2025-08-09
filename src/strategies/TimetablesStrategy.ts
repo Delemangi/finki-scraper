@@ -12,7 +12,7 @@ export class TimetablesStrategy implements ScraperStrategy {
   public postsSelector = 'div.col-sm-11';
 
   public getId(element: Element): null | string {
-    const url = element.querySelector(this.idsSelector)?.textContent?.trim();
+    const url = element.querySelector(this.idsSelector)?.textContent.trim();
     return url ?? null;
   }
 
@@ -20,7 +20,7 @@ export class TimetablesStrategy implements ScraperStrategy {
     const url = element.querySelector('a')?.getAttribute('href')?.trim();
     const link =
       url === undefined ? null : normalizeURL(url, 'https://finki.ukim.mk');
-    const title = element.querySelector('a')?.textContent?.trim() ?? '?';
+    const title = element.querySelector('a')?.textContent.trim() ?? '?';
 
     const embed = new EmbedBuilder()
       .setTitle(title)

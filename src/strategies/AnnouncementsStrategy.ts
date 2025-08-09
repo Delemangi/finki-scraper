@@ -21,7 +21,7 @@ export class AnnouncementsStrategy implements ScraperStrategy {
   public getPostData(element: Element): PostData {
     const url = element.querySelector('a')?.getAttribute('href')?.trim();
     const link = url === undefined ? null : `https://finki.ukim.mk${url}`;
-    const title = element.querySelector('a')?.textContent?.trim() ?? '?';
+    const title = element.querySelector('a')?.textContent.trim() ?? '?';
 
     const embed = new EmbedBuilder()
       .setTitle(title)

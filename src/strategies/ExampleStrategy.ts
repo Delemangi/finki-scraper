@@ -23,7 +23,7 @@ export class ExampleStrategy implements ScraperStrategy {
   public getPostData(element: Element): PostData {
     const url = element.querySelector('a')?.getAttribute('href')?.trim();
     const link = url ?? null;
-    const title = element.querySelector('a')?.textContent?.trim() ?? '?';
+    const title = element.querySelector('a')?.textContent.trim() ?? '?';
 
     const embed = new EmbedBuilder()
       .setTitle(title)

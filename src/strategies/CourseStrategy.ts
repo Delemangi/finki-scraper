@@ -57,7 +57,7 @@ export class CourseStrategy implements ScraperStrategy {
         ?.getAttribute('src')
         ?.trim() ?? '?';
     const authorName =
-      element.querySelector('h4 + div > a')?.textContent?.trim() ?? '?';
+      element.querySelector('h4 + div > a')?.textContent.trim() ?? '?';
     const authorLink =
       element
         .querySelector('div.d-flex.flex-column > div > a')
@@ -68,10 +68,10 @@ export class CourseStrategy implements ScraperStrategy {
     const content =
       element
         .querySelector('div.post-content-container')
-        ?.textContent?.trim()
+        ?.textContent.trim()
         .slice(0, 500) ?? '?';
     const title =
-      element.querySelector('h4 > a:last-of-type')?.textContent?.trim() ?? '?';
+      element.querySelector('h4 > a:last-of-type')?.textContent.trim() ?? '?';
 
     const embed = new EmbedBuilder()
       .setTitle(title)

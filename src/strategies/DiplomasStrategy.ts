@@ -40,48 +40,48 @@ export class DiplomasStrategy implements ScraperStrategy {
   }
 
   public getId(element: Element): null | string {
-    return element.querySelector(this.idsSelector)?.textContent?.trim() ?? null;
+    return element.querySelector(this.idsSelector)?.textContent.trim() ?? null;
   }
 
   public getPostData(element: Element): PostData {
     const title =
-      element.querySelector('div.panel-heading')?.textContent?.trim() ?? '?';
+      element.querySelector('div.panel-heading')?.textContent.trim() ?? '?';
     const [index, student] = element
       .querySelector(
         'div.panel-body > table tr:nth-of-type(1) > td:nth-of-type(2)',
       )
-      ?.textContent?.trim()
+      ?.textContent.trim()
       .split(' - ') ?? ['?', '?'];
     const mentor =
       element
         .querySelector(
           'div.panel-body > table tr:nth-of-type(2) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent.trim() ?? '?';
     const member1 =
       element
         .querySelector(
           'div.panel-body > table tr:nth-of-type(3) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent.trim() ?? '?';
     const member2 =
       element
         .querySelector(
           'div.panel-body > table tr:nth-of-type(4) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent.trim() ?? '?';
     const date =
       element
         .querySelector(
           'div.panel-body > table tr:nth-of-type(5) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent.trim() ?? '?';
     const status =
       element
         .querySelector(
           'div.panel-body > table tr:nth-of-type(6) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim() ?? '?';
+        ?.textContent.trim() ?? '?';
     const url =
       element
         .querySelector(
@@ -97,7 +97,7 @@ export class DiplomasStrategy implements ScraperStrategy {
         .querySelector(
           'div.panel-body > table tr:nth-of-type(8) > td:nth-of-type(2)',
         )
-        ?.textContent?.trim()
+        ?.textContent.trim()
         .slice(0, 500) ?? '?';
 
     const embed = new EmbedBuilder()
