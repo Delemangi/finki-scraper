@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { pino } from 'pino';
+import pino from 'pino';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const transport = pino.transport({
